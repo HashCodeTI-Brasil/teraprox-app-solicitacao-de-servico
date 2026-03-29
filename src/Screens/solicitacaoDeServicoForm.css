@@ -1,0 +1,189 @@
+/* ─── Wrapper ─────────────────────────────────────────────────────────────── */
+.sf-wrapper {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.sf-header {
+  padding: 14px 20px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.sf-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.sf-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ─── Fields ─────────────────────────────────────────────────────────────── */
+.sf-field { display: flex; flex-direction: column; gap: 5px; }
+.sf-label { font-size: 0.875rem; font-weight: 600; color: #374151; }
+.sf-required { color: #ef4444; margin-left: 2px; }
+.sf-hint { font-size: 0.78rem; color: #94a3b8; }
+
+.sf-input,
+.sf-select,
+.sf-textarea {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  font-size: 0.875rem;
+  color: #1e293b;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s;
+  font-family: inherit;
+}
+.sf-input:focus,
+.sf-select:focus,
+.sf-textarea:focus { border-color: #3b82f6; }
+.sf-textarea { resize: vertical; min-height: 80px; }
+
+/* ─── Radio ──────────────────────────────────────────────────────────────── */
+.sf-radio-group { display: flex; gap: 16px; }
+
+/* ─── Recurso Picker ─────────────────────────────────────────────────────── */
+.sf-recurso-picker { display: flex; flex-direction: column; gap: 5px; }
+
+.sf-recurso-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.sf-recurso-search-wrap .sf-input { flex: 1; }
+
+.sf-search-spinner {
+  position: absolute;
+  right: 10px;
+}
+
+.sf-recurso-dropdown {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.sf-recurso-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.1s;
+  font-size: 0.875rem;
+}
+.sf-recurso-option:hover { background: #f1f5f9; }
+
+.sf-recurso-nome { color: #1e293b; font-weight: 500; }
+.sf-recurso-tag { font-size: 0.75rem; color: #6b7280; background: #f3f4f6; padding: 2px 6px; border-radius: 4px; }
+
+/* ─── Chips ──────────────────────────────────────────────────────────────── */
+.sf-recurso-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+
+.sf-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px 3px 10px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  color: #1d4ed8;
+  font-weight: 500;
+}
+
+.sf-chip-remove {
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0 2px;
+}
+.sf-chip-remove:hover { color: #ef4444; }
+
+/* ─── Upload ─────────────────────────────────────────────────────────────── */
+.sf-upload-area {
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  padding: 16px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  text-align: center;
+}
+.sf-upload-area:hover { border-color: #3b82f6; background: #eff6ff; }
+
+.sf-upload-placeholder { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #6b7280; font-size: 0.875rem; }
+.sf-upload-icon { font-size: 1.5rem; }
+
+.sf-upload-selected { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.875rem; color: #374151; }
+.sf-upload-name { font-weight: 500; }
+
+/* ─── Attachments ────────────────────────────────────────────────────────── */
+.sf-attach-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.sf-attach-link { font-size: 0.875rem; color: #3b82f6; text-decoration: none; }
+.sf-attach-link:hover { text-decoration: underline; }
+
+/* ─── Buttons ────────────────────────────────────────────────────────────── */
+.sf-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  padding-top: 4px;
+  border-top: 1px solid #f1f5f9;
+  margin-top: 4px;
+}
+
+.sf-btn-save,
+.sf-btn-cancel,
+.sf-btn-delete {
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s;
+  min-width: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sf-btn-save { background: #3b82f6; color: #fff; }
+.sf-btn-save:hover { background: #2563eb; }
+.sf-btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.sf-btn-cancel { background: #f1f5f9; color: #374151; border: 1px solid #e2e8f0; }
+.sf-btn-cancel:hover { background: #e2e8f0; }
+
+.sf-btn-delete { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
+.sf-btn-delete:hover { background: #fecaca; }
+
+@media (max-width: 576px) {
+  .sf-wrapper { border-radius: 0; }
+  .sf-buttons { flex-direction: column-reverse; }
+  .sf-btn-save, .sf-btn-cancel, .sf-btn-delete { width: 100%; }
+}

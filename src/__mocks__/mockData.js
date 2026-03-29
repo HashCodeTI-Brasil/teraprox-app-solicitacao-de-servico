@@ -1,0 +1,158 @@
+/**
+ * Dados mockados para validação de layout em modo standalone.
+ * Removido automaticamente do bundle de produção via tree-shaking
+ * (só é importado quando standalone dev).
+ */
+import dayjs from 'dayjs';
+
+const now = dayjs();
+
+export const MOCK_SOLICITACOES = [
+  {
+    id: 1001,
+    status: 'PENDENTE',
+    descricaoDoProblema: 'Vibração excessiva no motor da esteira transportadora B3. Necessário verificar rolamentos e alinhamento.',
+    solicitante: 'Carlos Mendes',
+    recurso: { id: 10, nome: 'Esteira Transportadora B3' },
+    recursoNome: 'Esteira Transportadora B3',
+    dataDeAbertura: now.subtract(2, 'hour').toISOString(),
+    setor: 'Produção',
+    setorDestino: 'Manutenção Mecânica',
+  },
+  {
+    id: 1002,
+    status: 'APROVADO',
+    descricaoDoProblema: 'Vazamento de óleo hidráulico na prensa HP-200. Mancha no piso ao redor da máquina.',
+    solicitante: 'Ana Rodrigues',
+    recurso: { id: 11, nome: 'Prensa Hidráulica HP-200' },
+    recursoNome: 'Prensa Hidráulica HP-200',
+    dataDeAbertura: now.subtract(5, 'hour').toISOString(),
+    setor: 'Estamparia',
+    setorDestino: 'Manutenção Hidráulica',
+  },
+  {
+    id: 1003,
+    status: 'EM_EXECUCAO',
+    descricaoDoProblema: 'Painel elétrico do forno desligando aleatoriamente. Verificar disjuntores e fiação.',
+    solicitante: 'Roberto Lima',
+    recurso: { id: 12, nome: 'Forno Industrial F-05' },
+    recursoNome: 'Forno Industrial F-05',
+    dataDeAbertura: now.subtract(1, 'day').toISOString(),
+    setor: 'Tratamento Térmico',
+    setorDestino: 'Manutenção Elétrica',
+  },
+  {
+    id: 1004,
+    status: 'REPROVADO',
+    descricaoDoProblema: 'Solicitação de troca do filtro de ar do compressor. Porém o filtro foi trocado há menos de 30 dias.',
+    solicitante: 'Mariana Costa',
+    recurso: { id: 13, nome: 'Compressor Atlas C-12' },
+    recursoNome: 'Compressor Atlas C-12',
+    dataDeAbertura: now.subtract(2, 'day').toISOString(),
+    setor: 'Utilidades',
+    setorDestino: 'Manutenção Mecânica',
+  },
+  {
+    id: 1005,
+    status: 'CANCELADO',
+    descricaoDoProblema: 'Lâmpadas queimadas no galpão 3 — setor de expedição.',
+    solicitante: 'José Almeida',
+    recurso: { id: 14, nome: 'Iluminação Galpão 3' },
+    recursoNome: 'Iluminação Galpão 3',
+    dataDeAbertura: now.subtract(3, 'day').toISOString(),
+    setor: 'Expedição',
+    setorDestino: 'Manutenção Elétrica',
+  },
+  {
+    id: 1006,
+    status: 'PENDENTE',
+    descricaoDoProblema: 'Correia dentada da bomba de vácuo apresenta desgaste. Troca preventiva recomendada.',
+    solicitante: 'Fernanda Souza',
+    recurso: { id: 15, nome: 'Bomba de Vácuo BV-03' },
+    recursoNome: 'Bomba de Vácuo BV-03',
+    dataDeAbertura: now.subtract(6, 'hour').toISOString(),
+    setor: 'Laboratório',
+    setorDestino: 'Manutenção Mecânica',
+  },
+  {
+    id: 1007,
+    status: 'EM_EXECUCAO',
+    descricaoDoProblema: 'Sensor de temperatura do CLP da linha 2 descalibrado. Leitura diverge 15°C do pirômetro.',
+    solicitante: 'Carlos Mendes',
+    recurso: { id: 16, nome: 'CLP Linha 2 - Siemens S7' },
+    recursoNome: 'CLP Linha 2 - Siemens S7',
+    dataDeAbertura: now.subtract(8, 'hour').toISOString(),
+    setor: 'Produção',
+    setorDestino: 'Instrumentação',
+  },
+  {
+    id: 1008,
+    status: 'APROVADO',
+    descricaoDoProblema: 'Pneu do empilhadeira EMP-04 furado. Impossibilitando operação no turno.',
+    solicitante: 'Ana Rodrigues',
+    recurso: { id: 17, nome: 'Empilhadeira EMP-04' },
+    recursoNome: 'Empilhadeira EMP-04',
+    dataDeAbertura: now.subtract(12, 'hour').toISOString(),
+    setor: 'Logística',
+    setorDestino: 'Manutenção Mecânica',
+  },
+  {
+    id: 1009,
+    status: 'PENDENTE',
+    descricaoDoProblema: 'Ar condicionado da sala de controle com ruído anormal e baixo rendimento de refrigeração.',
+    solicitante: 'Roberto Lima',
+    recurso: { id: 18, nome: 'Split 60k BTU - Sala Controle' },
+    recursoNome: 'Split 60k BTU - Sala Controle',
+    dataDeAbertura: now.subtract(4, 'hour').toISOString(),
+    setor: 'Administrativo',
+    setorDestino: 'Manutenção Predial',
+  },
+  {
+    id: 1010,
+    status: 'PENDENTE',
+    descricaoDoProblema: 'Válvula solenoide da linha de vapor travada na posição aberta. Risco de superaquecimento.',
+    solicitante: 'Fernanda Souza',
+    recurso: { id: 19, nome: 'Válvula Solenoide VS-22' },
+    recursoNome: 'Válvula Solenoide VS-22',
+    dataDeAbertura: now.subtract(30, 'minute').toISOString(),
+    setor: 'Utilidades',
+    setorDestino: 'Instrumentação',
+  },
+];
+
+export const MOCK_RECURSOS = [
+  { id: 10, nome: 'Esteira Transportadora B3', tag: 'EST-B3' },
+  { id: 11, nome: 'Prensa Hidráulica HP-200', tag: 'PRS-200' },
+  { id: 12, nome: 'Forno Industrial F-05', tag: 'FOR-05' },
+  { id: 13, nome: 'Compressor Atlas C-12', tag: 'CMP-12' },
+  { id: 14, nome: 'Iluminação Galpão 3', tag: 'ILU-G3' },
+  { id: 15, nome: 'Bomba de Vácuo BV-03', tag: 'BV-03' },
+  { id: 16, nome: 'CLP Linha 2 - Siemens S7', tag: 'CLP-L2' },
+  { id: 17, nome: 'Empilhadeira EMP-04', tag: 'EMP-04' },
+  { id: 18, nome: 'Split 60k BTU - Sala Controle', tag: 'AC-SC' },
+  { id: 19, nome: 'Válvula Solenoide VS-22', tag: 'VS-22' },
+  { id: 20, nome: 'Torno CNC TC-01', tag: 'TOR-01' },
+  { id: 21, nome: 'Ponte Rolante PR-02', tag: 'PR-02' },
+];
+
+export const MOCK_SETORES = [
+  { id: 1, nome: 'Manutenção Mecânica' },
+  { id: 2, nome: 'Manutenção Elétrica' },
+  { id: 3, nome: 'Manutenção Hidráulica' },
+  { id: 4, nome: 'Instrumentação' },
+  { id: 5, nome: 'Manutenção Predial' },
+  { id: 6, nome: 'Produção' },
+  { id: 7, nome: 'Logística' },
+];
+
+export const MOCK_USER = {
+  token: 'mock-token-dev',
+  userId: 'user-mock-001',
+  fullName: 'Usuário Desenvolvimento',
+  userName: 'dev.user',
+  companyId: 'company-mock-001',
+  company: 'mock-company',
+  companyName: 'Teraprox Mock Corp',
+  setor: 'Produção',
+  role: 'admin',
+};

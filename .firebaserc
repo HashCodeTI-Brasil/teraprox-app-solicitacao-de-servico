@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "teraprox"
+  },
+  "targets": {
+    "teraprox": {
+      "hosting": {
+        "teraprox-solicitacoes": [
+          "teraprox-solicitacoes"
+        ]
+      }
+    }
+  }
+}
