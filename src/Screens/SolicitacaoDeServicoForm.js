@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { Form, Spinner } from 'react-bootstrap';
-import { useToast, RecursoDisplayer } from '@teraprox/core-sdk';
+import { useToast, RecursoDisplayer } from 'teraprox-core-sdk';
 import { withWebContext } from '../Hocs/withWebContext';
 import {
   clearSolicitacaoDeServicoForm,

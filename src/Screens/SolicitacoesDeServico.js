@@ -5,10 +5,8 @@ import { Spinner } from 'react-bootstrap';
 import { FiRefreshCw, FiPlus, FiSearch, FiCalendar, FiFilter, FiX } from 'react-icons/fi';
 import { MdOutlineAssignmentLate } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
-import { useToasts } from 'react-toast-notifications';
-import { useWebProvider } from '../hooks/useWebProvider';
+import { useCoreService, useToast } from 'teraprox-core-sdk';
 import useNavigator from '../hooks/useNavigator';
-import { MatchingObject } from '../websocket/models/MatchingObject';
 import {
   setSolicitacoes,
   setSolicitante,
@@ -252,10 +250,10 @@ function GroupHeader({ title, count, collapsed, onToggle }) {
 
 // ─── Main screen ───────────────────────────────────────────────────────────
 function SolicitacoesDeServico() {
-  const { controller, subscribe, unsubscribe } = useWebProvider();
+  const { createController, subscribe, unsubscribe } = useCoreService();
   const navigate = useNavigator();
   const dispatch = useDispatch();
-  const { addToast } = useToasts();
+  const toast = useToast();
 
   const solicitacoes = useSelector((state) => state.solicitacaoDeServico?.solicitacoes ?? []);
   const { userId, fullName, setor } = useSelector((state) => state.global) ?? {};
@@ -281,18 +279,18 @@ function SolicitacoesDeServico() {
   // Real-time update subscription
   const refresher = useCallback(
     (payload) => {
-      controller('solicitacaoDeServico')
+      createController('solicitacaoDeServico')
         .read('', payload)
         .then((ss) => {
           if (ss) dispatch(updateSingleSsRow(ss));
         })
         .catch(() => {});
     },
-    [controller, dispatch]
+    [createController, dispatch]
   );
 
   useEffect(() => {
-    const mo = new MatchingObject('solicitacaoDeServico', '*', refresher);
+    const mo = { context: 'solicitacaoDeServico', location: '*', refresher };
     subscribe(mo);
     return () => unsubscribe(mo);
   }, [subscribe, unsubscribe, refresher]);
@@ -303,7 +301,7 @@ function SolicitacoesDeServico() {
     const dataFimMod = fim.add(5, 'minute');
     setLoading(true);
     try {
-      const data = await controller('solicitacaoDeServico').get(
+      const data = await createController('solicitacaoDeServico').get(
         `solicitacaoDeServico/findBetweenDates/${inicio.format('YYYY-MM-DDTHH:mm')}/${dataFimMod.toISOString()}`
       );
       const sorted = (Array.isArray(data) ? data : []).sort((a, b) => {
@@ -313,11 +311,11 @@ function SolicitacoesDeServico() {
       });
       dispatch(setSolicitacoes(sorted));
     } catch (err) {
-      addToast('Erro ao carregar solicitações.', { appearance: 'error', autoDismiss: true });
+      toast.error('Erro ao carregar solicitações.');
     } finally {
       setLoading(false);
     }
-  }, [activePeriod, controller, dispatch, addToast]);
+  }, [activePeriod, createController, dispatch, toast]);
 
   useEffect(() => {
     fetchSolicitacoes();
@@ -394,12 +392,9 @@ function SolicitacoesDeServico() {
   };
 
   const handleNovaClick = async () => {
-    const recursos = await controller('recurso').readAll().catch(() => []);
+    const recursos = await createController('recurso').readAll().catch(() => []);
     if (!Array.isArray(recursos) || recursos.length === 0) {
-      addToast('Sua empresa não possui recursos cadastrados. Contate um administrador!', {
-        appearance: 'warning',
-        autoDismiss: true,
-      });
+      toast.warning('Sua empresa não possui recursos cadastrados. Contate um administrador!');
       return;
     }
     dispatch(setSolicitante({ userId, fullName }));

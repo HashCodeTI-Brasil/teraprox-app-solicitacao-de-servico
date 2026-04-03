@@ -1,27 +1,26 @@
 /**
- * withWebContext HOC — connects Redux state and webProvider to the wrapped component.
+ * withWebContext HOC — connects Redux state and CoreService to the wrapped component.
  * Provides: controller, form, state, dispatch, navigate, save, remove, cancelar.
  */
 import { useDispatch, useSelector } from 'react-redux';
-import { useToasts } from 'react-toast-notifications';
+import { useCoreService, useToast } from 'teraprox-core-sdk';
 import useNavigator from '../hooks/useNavigator';
-import { useWebProvider } from '../hooks/useWebProvider';
 
 export const withWebContext = (Component) => {
   const WithWebContext = (props) => {
-    const { controller } = useWebProvider();
-    const toast = useToasts();
+    const { createController } = useCoreService();
+    const toast = useToast();
     const navigate = useNavigator();
     const dispatch = useDispatch();
 
     const context = props.context || 'solicitacaoDeServico';
     const form = useSelector((state) => state[context]?.form);
     const state = useSelector((state) => state[context]);
-    const baseController = controller(context);
+    const baseController = createController(context);
 
     const remove = () => {
       baseController.delete(context, form.id).then(() => {
-        toast.addToast(`Solicitação ${form.id} removida.`, { appearance: 'warning', autoDismiss: true });
+        toast.warning(`Solicitação ${form.id} removida.`);
       });
       dispatch({ type: `${context}Reducer/clear`, payload: null });
     };
@@ -33,7 +32,7 @@ export const withWebContext = (Component) => {
     return (
       <Component
         {...props}
-        controller={controller}
+        controller={createController}
         contextController={baseController}
         state={state}
         context={context}

@@ -87,6 +87,11 @@ module.exports = {
                 './ReducersBundle': './src/federation/reducersBundle',
             },
             shared: {
+                'teraprox-core-sdk': {
+                    singleton: true,
+                    requiredVersion: false,
+                    eager: false,
+                },
                 ...(() => {
                     const shared = {};
                     [
