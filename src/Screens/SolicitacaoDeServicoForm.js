@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { Form, Spinner } from 'react-bootstrap';
-import { useToasts } from 'react-toast-notifications';
+import { useToast, RecursoDisplayer } from '@teraprox/core-sdk';
 import { withWebContext } from '../Hocs/withWebContext';
 import {
   clearSolicitacaoDeServicoForm,
@@ -15,76 +15,6 @@ import { formatIsoDate } from '../Services/stringUtils';
 import './solicitacaoDeServicoForm.css';
 
 // ─── Recurso Picker ───────────────────────────────────────────────────────────
-function RecursoPicker({ controller, selectedRecursos, onAdd, onRemove }) {
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const debounceRef = useRef(null);
-
-  const search = useCallback(async (q) => {
-    if (!q || q.length < 2) { setResults([]); return; }
-    setLoading(true);
-    try {
-      const data = await controller('solicitacaoDeServico').readAll('recurso', { search: q });
-      const list = Array.isArray(data) ? data : (data?.data || data?.results || []);
-      setResults(list.slice(0, 10));
-    } catch {
-      setResults([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [controller]);
-
-  const handleChange = (e) => {
-    const val = e.target.value;
-    setQuery(val);
-    clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => search(val), 300);
-  };
-
-  const handleSelect = (recurso) => {
-    const alreadyAdded = selectedRecursos.some(r => r.id === recurso.id);
-    if (!alreadyAdded) onAdd([...selectedRecursos, recurso]);
-    setQuery('');
-    setResults([]);
-  };
-
-  return (
-    <div className="sf-recurso-picker">
-      <label className="sf-label">Ativo / Recurso <span className="sf-required">*</span></label>
-      <div className="sf-recurso-search-wrap">
-        <input
-          className="sf-input"
-          placeholder="Pesquisar ativo (ex: Bomba, Motor...)"
-          value={query}
-          onChange={handleChange}
-        />
-        {loading && <Spinner animation="border" size="sm" className="sf-search-spinner" />}
-      </div>
-      {results.length > 0 && (
-        <ul className="sf-recurso-dropdown">
-          {results.map(r => (
-            <li key={r.id} className="sf-recurso-option" onClick={() => handleSelect(r)}>
-              <span className="sf-recurso-nome">{r.nome || r.name || r.descricao}</span>
-              {r.tag && <span className="sf-recurso-tag">{r.tag}</span>}
-            </li>
-          ))}
-        </ul>
-      )}
-      {selectedRecursos.length > 0 && (
-        <div className="sf-recurso-chips">
-          {selectedRecursos.map(r => (
-            <span key={r.id} className="sf-chip">
-              {r.nome || r.name || r.descricao}
-              <button type="button" className="sf-chip-remove" onClick={() => onRemove(r)}>×</button>
-            </span>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 // ─── Sector Selector ──────────────────────────────────────────────────────────
 const setoresCacheByCompany = new Map();
 const setoresRequestByCompany = new Map();
@@ -203,7 +133,7 @@ function UploadArea({ file, onSelect, onRemove }) {
 
 // ─── Main Form ────────────────────────────────────────────────────────────────
 function SolicitacaoDeServicoForm({ form, remove, cancelar, dispatch, controller }) {
-  const { addToast } = useToasts();
+  const toast = useToast();
   const [disabled, setDisabled] = useState(false);
   const [emergencial, setEmergencial] = useState(null);
   const [anexo, setAnexo] = useState(null);
@@ -218,15 +148,15 @@ function SolicitacaoDeServicoForm({ form, remove, cancelar, dispatch, controller
 
   const validate = () => {
     if (!recursos.length) {
-      addToast('Selecione pelo menos um ativo/recurso.', { appearance: 'warning', autoDismiss: true });
+      toast.warning('Selecione pelo menos um ativo/recurso.');
       return false;
     }
     if (!form?.descricaoDoProblema?.trim()) {
-      addToast('Descrição do problema é obrigatória.', { appearance: 'warning', autoDismiss: true });
+      toast.warning('Descrição do problema é obrigatória.');
       return false;
     }
     if (emergencial === null) {
-      addToast('Informe se é emergencial.', { appearance: 'warning', autoDismiss: true });
+      toast.warning('Informe se é emergencial.');
       return false;
     }
     return true;
@@ -253,12 +183,12 @@ function SolicitacaoDeServicoForm({ form, remove, cancelar, dispatch, controller
         return controller('solicitacaoDeServico').post(rota, payload);
       });
       await Promise.all(requests);
-      addToast('Solicitação salva com sucesso!', { appearance: 'success', autoDismiss: true });
+      toast.success('Solicitação salva com sucesso!');
       dispatch(clearSolicitacaoDeServicoForm());
       setAnexo(null);
       cancelar();
     } catch (error) {
-      addToast(`Erro ao salvar: ${error?.message || 'falha inesperada'}`, { appearance: 'error', autoDismiss: true });
+      toast.error(`Erro ao salvar: ${error?.message || 'falha inesperada'}`);
     } finally {
       setDisabled(false);
     }
@@ -272,12 +202,29 @@ function SolicitacaoDeServicoForm({ form, remove, cancelar, dispatch, controller
 
       <div className="sf-body">
         {/* Recursos */}
-        <RecursoPicker
-          controller={controller}
-          selectedRecursos={recursos}
-          onAdd={(list) => dispatch(setRecursos(list))}
-          onRemove={(r) => dispatch(setRecursos(recursos.filter(x => x.id !== r.id)))}
-        />
+        <div className="sf-field">
+          <label className="sf-label">Ativo / Recurso <span className="sf-required">*</span></label>
+          <RecursoDisplayer
+            selectedList={recursos}
+            onSaveRecurso={(list) => dispatch(setRecursos(list))}
+          />
+          {recursos.length > 0 && (
+            <div className="sf-recurso-chips">
+              {recursos.map(r => (
+                <span key={r.id} className="sf-chip">
+                  {r.nome || r.name || r.descricao}
+                  <button
+                    type="button"
+                    className="sf-chip-remove"
+                    onClick={() => dispatch(setRecursos(recursos.filter(x => x.id !== r.id)))}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Data */}
         <div className="sf-field">
