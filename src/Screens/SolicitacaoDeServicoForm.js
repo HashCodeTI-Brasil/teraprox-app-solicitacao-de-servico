@@ -57,7 +57,7 @@ function SetorSelector({ controller, selected, onSelect }) {
         let pending = setoresRequestByCompany.get(companyId);
         if (!pending) {
           pending = controllerRef.current('user', endPointUser)
-            .get(`findSetoresByCompanyId/${companyId}`)
+            .get(`findSetoresByCompanyId/${companyId}`, undefined, { "x-teraprox-host": "user" })
             .then((response) => {
               const list = extractSetorList(response).filter((item) => item?.nome);
               setoresCacheByCompany.set(companyId, list);
