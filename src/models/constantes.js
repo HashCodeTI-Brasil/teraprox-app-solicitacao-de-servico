@@ -9,7 +9,7 @@ export const endPointManutencao =
   process.env.REACT_APP_END_POINT_MANUTENCAO || 'http://localhost:3001';
 
 export const endPointUser =
-  process.env.REACT_APP_END_POINT_USER || 'https://teraprox-gateway-7ggpsfrixq-rj.a.run.app/user/';
+  process.env.REACT_APP_END_POINT_USER || 'https://teraprox-gateway-7ggpsfrixq-rj.a.run.app/';
 
 export const ids = {
   solicitacoesDeServicoFilterIconButton: 'sol-filter-btn',
