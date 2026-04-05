@@ -6,10 +6,10 @@ export const paths = {
 };
 
 export const endPointManutencao =
-  process.env.REACT_APP_END_POINT_MANUTENCAO || 'http://localhost:3001';
+  process.env.REACT_APP_END_POINT_MANUTENCAO;
 
 export const endPointUser =
-  process.env.REACT_APP_END_POINT_USER || 'https://teraprox-gateway-7ggpsfrixq-rj.a.run.app/';
+  process.env.REACT_APP_END_POINT_USER;
 
 export const ids = {
   solicitacoesDeServicoFilterIconButton: 'sol-filter-btn',

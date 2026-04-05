@@ -20,7 +20,7 @@ export { MatchingObject };
 const WebProvider = createContext(null);
 export { WebProvider };
 
-const endPointManutencao = process.env.REACT_APP_END_POINT_MANUTENCAO || 'http://localhost:3001';
+const endPointManutencao = process.env.REACT_APP_END_POINT_MANUTENCAO;
 
 const IS_STANDALONE = !window.__TERAPROX_HOSTED_BY_CORE__;
 
