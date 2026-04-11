@@ -15,6 +15,7 @@ import {
 } from '../Reducers/solicitacaoDeServicoReducer';
 import { paths, getStatusColor } from '../models/constantes';
 import { formatShortDate, formatDate } from '../Services/stringUtils';
+import { StatusPills, PeriodSelector } from 'teraprox-ui-kit';
 
 // ─── Status pills configuration ───────────────────────────────────────────
 const STATUS_PILLS = ['PENDENTE', 'APROVADO', 'REPROVADO', 'CANCELADO', 'EM_EXECUCAO'];
@@ -109,44 +110,6 @@ function SolicitacaoCard({ solicitacao, onCardClick }) {
           </span>
         </div>
       </div>
-    </div>
-  );
-}
-
-// ─── Period selector dropdown (inline) ────────────────────────────────────
-function PeriodDropdown({ activePeriod, onChange }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    const handler = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
-
-  const current = PERIOD_OPTIONS.find((o) => o.value === activePeriod);
-
-  return (
-    <div className="ss-dropdown" ref={ref}>
-      <button className="ss-toolbar-btn" onClick={() => setOpen(!open)}>
-        <FiCalendar size={14} />
-        <span>{current?.label ?? 'Período'}</span>
-      </button>
-      {open && (
-        <div className="ss-dropdown-menu">
-          {PERIOD_OPTIONS.map((o) => (
-            <button
-              key={o.value}
-              className={`ss-dropdown-item ${activePeriod === o.value ? 'active' : ''}`}
-              onClick={() => { onChange(o.value); setOpen(false); }}
-            >
-              {o.label}
-            </button>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
@@ -259,7 +222,8 @@ function SolicitacoesDeServico() {
   const { userId, fullName, setor } = useSelector((state) => state.global) ?? {};
 
   const [loading, setLoading] = useState(false);
-  const [activePeriod, setActivePeriod] = useState('week');
+  const [startDate, setStartDate] = useState(getPeriodRange('week').inicio.format('YYYY-MM-DDTHH:mm'));
+  const [endDate, setEndDate] = useState(getPeriodRange('week').fim.format('YYYY-MM-DDTHH:mm'));
   const [activePills, setActivePills] = useState(new Set());
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOption, setSortOption] = useState('date_desc');
@@ -275,6 +239,18 @@ function SolicitacoesDeServico() {
     });
     return map;
   }, [solicitacoes]);
+
+  const statusMeta = useMemo(() => {
+    const meta = {};
+    STATUS_PILLS.forEach((status) => {
+      meta[status] = {
+        label: status,
+        color: getStatusColor(status),
+        count: counters[status] ?? 0,
+      };
+    });
+    return meta;
+  }, [counters]);
 
   // Real-time update subscription
   const refresher = useCallback(
@@ -297,7 +273,8 @@ function SolicitacoesDeServico() {
 
   // Fetch function
   const fetchSolicitacoes = useCallback(async () => {
-    const { inicio, fim } = getPeriodRange(activePeriod);
+    const inicio = dayjs(startDate);
+    const fim = dayjs(endDate);
     const dataFimMod = fim.add(5, 'minute');
     setLoading(true);
     try {
@@ -315,11 +292,11 @@ function SolicitacoesDeServico() {
     } finally {
       setLoading(false);
     }
-  }, [activePeriod, createController, dispatch, toast]);
+  }, [startDate, endDate, createController, dispatch, toast]);
 
   useEffect(() => {
     fetchSolicitacoes();
-  }, [activePeriod]);
+  }, [startDate, endDate]);
 
   // Toggle status pill
   const togglePill = (status) => {
@@ -426,21 +403,11 @@ function SolicitacoesDeServico() {
 
       {/* Status pills */}
       <div className="ss-pills-row">
-        {STATUS_PILLS.map((status) => {
-          const cor = getStatusColor(status);
-          const active = activePills.has(status);
-          const count = counters[status] ?? 0;
-          return (
-            <button
-              key={status}
-              className={`ss-pill ${active ? 'active' : ''}`}
-              style={active ? { backgroundColor: `${cor}20`, borderColor: cor, color: cor } : {}}
-              onClick={() => togglePill(status)}
-            >
-              {status}: {count}
-            </button>
-          );
-        })}
+        <StatusPills 
+          statuses={statusMeta} 
+          activeKeys={Array.from(activePills)} 
+          onSelectionChange={(keys) => setActivePills(new Set(keys))} 
+        />
         {activePills.size > 0 && (
           <button className="ss-pill ss-pill-clear" onClick={() => setActivePills(new Set())}>
             <FiX size={12} /> Limpar
@@ -467,9 +434,21 @@ function SolicitacoesDeServico() {
 
       {/* Toolbar: period / sort / group */}
       <div className="ss-toolbar">
-        <PeriodDropdown activePeriod={activePeriod} onChange={(v) => { setActivePeriod(v); }} />
-        <SortDropdown activeSort={sortOption} onChange={setSortOption} />
-        <GroupDropdown activeGroup={groupOption} onChange={(v) => { setGroupOption(v); setCollapsedGroups(new Set()); }} />
+        <PeriodSelector 
+          startDate={startDate} 
+          endDate={endDate} 
+          onStartDateChange={setStartDate} 
+          onEndDateChange={setEndDate} 
+          onPresetSelect={(p) => { 
+            const {inicio, fim} = getPeriodRange(p); 
+            setStartDate(inicio.format('YYYY-MM-DDTHH:mm')); 
+            setEndDate(fim.format('YYYY-MM-DDTHH:mm')); 
+          }} 
+        />
+        <div style={{display: 'flex', gap: '8px'}}>
+          <SortDropdown activeSort={sortOption} onChange={setSortOption} />
+          <GroupDropdown activeGroup={groupOption} onChange={(v) => { setGroupOption(v); setCollapsedGroups(new Set()); }} />
+        </div>
       </div>
 
       {/* List */}

@@ -12,134 +12,34 @@ import {
 } from '../Reducers/solicitacaoDeServicoReducer';
 import { endPointUser } from '../models/constantes';
 import { formatIsoDate } from '../Services/stringUtils';
+import { SectorSelector, UploadArea, ActionButtons } from 'teraprox-ui-kit';
 import './solicitacaoDeServicoForm.css';
 
 // ─── Recurso Picker ───────────────────────────────────────────────────────────
-// ─── Sector Selector ──────────────────────────────────────────────────────────
-const setoresCacheByCompany = new Map();
-const setoresRequestByCompany = new Map();
-
-const extractSetorList = (payload) => {
-  if (Array.isArray(payload)) return payload;
-  if (Array.isArray(payload?.data)) return payload.data;
-  if (Array.isArray(payload?.data?.data)) return payload.data.data;
-  if (Array.isArray(payload?.results)) return payload.results;
-  return [];
-};
-
-function SetorSelector({ controller, selected, onSelect }) {
-  const { companyId } = useSelector((state) => state.global ?? {});
-  const [setores, setSetores] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const controllerRef = useRef(controller);
-
-  useEffect(() => {
-    controllerRef.current = controller;
-  }, [controller]);
-
-  useEffect(() => {
-    let mounted = true;
-
-    const loadSetores = async () => {
-      if (!companyId) {
-        if (mounted) setSetores([]);
-        return;
-      }
-
-      const cache = setoresCacheByCompany.get(companyId);
-      if (cache) {
-        if (mounted) setSetores(cache);
-        return;
-      }
-
-      setLoading(true);
-      try {
-        let pending = setoresRequestByCompany.get(companyId);
-        if (!pending) {
-          pending = controllerRef.current('user', endPointUser)
-            .get(`findSetoresByCompanyId/${companyId}`, undefined, { "x-teraprox-host": "user" })
-            .then((response) => {
-              const list = extractSetorList(response).filter((item) => item?.nome);
-              setoresCacheByCompany.set(companyId, list);
-              return list;
-            })
-            .catch(() => [])
-            .finally(() => {
-              setoresRequestByCompany.delete(companyId);
-            });
-          setoresRequestByCompany.set(companyId, pending);
-        }
-
-        const list = await pending;
-        if (mounted) setSetores(list);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
-
-    loadSetores();
-    return () => { mounted = false; };
-  }, [companyId]);
-
-  return (
-    <div className="sf-field">
-      <label className="sf-label">Setor responsável pela execução</label>
-      {loading ? (
-        <Spinner animation="border" size="sm" />
-      ) : (
-        <Form.Select
-          className="sf-select"
-          value={selected || ''}
-          onChange={e => onSelect(e.target.value)}
-        >
-          <option value="">— Selecione um setor —</option>
-          {setores.map(s => (
-            <option key={s.id || s._id || s.nome} value={s.nome}>
-              {s.nome}
-            </option>
-          ))}
-        </Form.Select>
-      )}
-    </div>
-  );
-}
-
-// ─── Upload Area ──────────────────────────────────────────────────────────────
-function UploadArea({ file, onSelect, onRemove }) {
-  const inputRef = useRef(null);
-  return (
-    <div className="sf-upload-area" onClick={() => !file && inputRef.current?.click()}>
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/*,application/pdf"
-        style={{ display: 'none' }}
-        onChange={e => onSelect(e.target.files?.[0] || null)}
-      />
-      {file ? (
-        <div className="sf-upload-selected">
-          <span className="sf-upload-name">📎 {file.name}</span>
-          <button type="button" className="sf-chip-remove" onClick={e => { e.stopPropagation(); onRemove(); }}>×</button>
-        </div>
-      ) : (
-        <div className="sf-upload-placeholder">
-          <span className="sf-upload-icon">📷</span>
-          <span>Clique para adicionar foto ou arquivo</span>
-        </div>
-      )}
-    </div>
-  );
-}
-
 // ─── Main Form ────────────────────────────────────────────────────────────────
 function SolicitacaoDeServicoForm({ form, remove, cancelar, dispatch, controller }) {
   const toast = useToast();
   const [disabled, setDisabled] = useState(false);
   const [emergencial, setEmergencial] = useState(null);
   const [anexo, setAnexo] = useState(null);
+  const [setores, setSetores] = useState([]);
+  const { companyId } = useSelector((state) => state.global ?? {});
 
   const recursos = form?.recursos || [];
   const anexosPersistidos = Array.isArray(form?.anexos) ? form.anexos : [];
+
+  useEffect(() => {
+    let mounted = true;
+    if (companyId) {
+      controller('user', endPointUser)
+        .get(`findSetoresByCompanyId/${companyId}`, undefined, { "x-teraprox-host": "user" })
+        .then((resp) => {
+          let list = Array.isArray(resp) ? resp : Array.isArray(resp?.data) ? resp.data : [];
+          if (mounted) setSetores(list.filter(i => i?.nome));
+        }).catch(() => {});
+    }
+    return () => { mounted = false; };
+  }, [companyId, controller]);
 
   useEffect(() => {
     dispatch(setDataAbertura(new Date().toISOString()));
@@ -238,10 +138,10 @@ function SolicitacaoDeServicoForm({ form, remove, cancelar, dispatch, controller
         </div>
 
         {/* Setor */}
-        <SetorSelector
-          controller={controller}
-          selected={form?.setorDestino}
-          onSelect={(nome) => dispatch(setSetorDestinoSolicitacao(nome))}
+        <SectorSelector
+          setores={setores}
+          defaultSectorName={form?.setorDestino}
+          onSectorSelect={(setor) => dispatch(setSetorDestinoSolicitacao(setor.nome))}
         />
 
         {/* Descrição */}
@@ -283,7 +183,16 @@ function SolicitacaoDeServicoForm({ form, remove, cancelar, dispatch, controller
         {/* Upload */}
         <div className="sf-field">
           <label className="sf-label">Foto / Anexo</label>
-          <UploadArea file={anexo} onSelect={setAnexo} onRemove={() => setAnexo(null)} />
+          <UploadArea 
+            onFilePut={setAnexo} 
+            anexo={anexo} 
+            accept={{ "image/jpeg": [], "image/png": [], "application/pdf": [] }}
+          />
+          {anexo && (
+            <div style={{ marginTop: '8px' }}>
+              <button type="button" className="sf-btn-delete" onClick={() => setAnexo(null)}>Remover foto</button>
+            </div>
+          )}
         </div>
 
         {/* Anexos persistidos */}
@@ -302,26 +211,15 @@ function SolicitacaoDeServicoForm({ form, remove, cancelar, dispatch, controller
 
         {/* Buttons */}
         <div className="sf-buttons">
-          <button className="sf-btn-cancel" type="button" onClick={cancelar} disabled={disabled}>
-            Cancelar
-          </button>
-
-          {form?.id && (
-            <button
-              className="sf-btn-delete"
-              type="button"
-              onClick={() => {
-                if (window.confirm(`Deseja deletar a Solicitação ${form.id}?`)) remove();
-              }}
-              disabled={disabled}
-            >
-              Excluir
-            </button>
-          )}
-
-          <button className="sf-btn-save" type="button" onClick={handleSave} disabled={disabled}>
-            {disabled ? <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> : 'Salvar'}
-          </button>
+          <ActionButtons
+            disabled={disabled}
+            saveLabel={disabled ? <Spinner as="span" animation="border" size="sm" /> : 'Salvar'}
+            saveClick={handleSave}
+            isEditing={!!form?.id}
+            deleteConfirmMsg={`Deseja deletar a Solicitação ${form?.id}?`}
+            deleteClick={remove}
+            cancelEditClick={cancelar}
+          />
         </div>
       </div>
     </div>

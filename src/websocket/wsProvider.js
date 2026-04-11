@@ -23,6 +23,7 @@ export { WebProvider };
 const endPointManutencao = process.env.REACT_APP_END_POINT_MANUTENCAO;
 
 const IS_STANDALONE = !window.__TERAPROX_HOSTED_BY_CORE__;
+const IS_DEVMODE = process.env.REACT_APP_DEVMODE === 'active';
 
 // ─── Mock controller (retorna dados fake para validação de layout) ──────
 function createMockController(context) {
@@ -62,9 +63,13 @@ export default function WebProviderComponent({ children }) {
   const { token, userId } = useSelector((state) => state.global);
   const matchingObjectsRef = useRef([]);
 
-  // Em standalone, seta o usuário mockado para a UI funcionar
+  // Em standalone sem devmode usa mock.
+  // Em devmode usa token fixo de desenvolvimento reconhecido pelas APIs locais.
   useEffect(() => {
-    if (IS_STANDALONE && !token) {
+    if (!IS_STANDALONE || token) return;
+    if (IS_DEVMODE) {
+      dispatch(setAuth({ ...MOCK_USER, token: 'dev-standalone-token' }));
+    } else {
       dispatch(setAuth(MOCK_USER));
     }
   }, [dispatch, token]);
@@ -81,10 +86,11 @@ export default function WebProviderComponent({ children }) {
 
   const basicController = useCallback(
     (context) => {
-      if (IS_STANDALONE) return createMockController(context);
+      if (IS_STANDALONE && !IS_DEVMODE) return createMockController(context);
       return createBasicController(context, { api: api.current });
     },
-    []
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [api.current]
   );
 
   const subscribe = useCallback((matchObject) => {

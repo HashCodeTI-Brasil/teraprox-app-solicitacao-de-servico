@@ -81,10 +81,11 @@ module.exports = {
             name: 'teraprox_app_solicitacao',
             filename: 'remoteEntry.js',
             exposes: {
-                './SolicitacoesDeServico':  './src/Screens/SolicitacoesDeServico',
+                './SolicitacoesDeServico':    './src/Screens/SolicitacoesDeServico',
                 './SolicitacaoDeServicoForm': './src/Screens/SolicitacaoDeServicoForm',
-                './FederatedBridge': './src/federation/FederatedBridge',
-                './ReducersBundle': './src/federation/reducersBundle',
+                './FederatedBridge':          './src/federation/FederatedBridge',
+                './ReducersBundle':           './src/federation/reducersBundle',
+                './Manifest':                 './src/federation/manifest',
             },
             shared: {
                 'teraprox-core-sdk': {
