@@ -56,29 +56,20 @@ export function useAprovacaoViewModel(): IAprovacaoViewModel {
   const [buscaAnexosRealizada, setBuscaAnexosRealizada] = useState(false);
 
   // ── Load setores ──────────────────────────────────────────────────────────
+  // A API user expõe GET /setor/all (não segue o padrão OnRoad de GET /:context = readAll).
+  // Usando path explícito para funcionar tanto via gateway quanto standalone.
+  // TODO: normalizar API user para que GET /setor = readAll
   useEffect(() => {
     let mounted = true;
-    createController('setor').readAll()
+    createController('setor').readAll('setor/all')
       .then((data: any) => {
         const list = Array.isArray(data) ? data : [];
-        if (mounted) {
-           if (list.length > 0) {
-              setSetores(list);
-           } else {
-             console.log('[Mock] Fallback setores Aprovacao (API retornou vazio)');
-             setSetores([
-                { id: 1, nome: 'Manutenção Mecânica' },
-                { id: 2, nome: 'Manutenção Elétrica' },
-                { id: 3, nome: 'Operação' },
-                { id: 4, nome: 'Utilidades' },
-              ]);
-           }
+        if (mounted && list.length > 0) {
+          setSetores(list);
         }
       })
       .catch(() => {
-        // Mock fallback para ambiente de desenvolvimento standalone
-        if (mounted && process.env.NODE_ENV !== 'production') {
-          console.log('[Mock] Fallback setores Aprovacao via catch');
+        if (mounted) {
           setSetores([
             { id: 1, nome: 'Manutenção Mecânica' },
             { id: 2, nome: 'Manutenção Elétrica' },
@@ -113,7 +104,7 @@ export function useAprovacaoViewModel(): IAprovacaoViewModel {
   useEffect(() => {
     if (!form?.id || buscaAnexosRealizada || (Array.isArray(form?.anexos) && form.anexos.length)) return;
     setCarregandoAnexos(true);
-    contextController.read('', form.id)
+    contextController.read(undefined, form.id)
       .then((result: any) => {
         setAnexosSolicitacao(Array.isArray(result?.anexos) ? result.anexos : []);
       })
@@ -177,7 +168,7 @@ export function useAprovacaoViewModel(): IAprovacaoViewModel {
     setIsSubmitting(true);
     try {
       if (formState.showSectorChange && typeof formState.showSectorChange !== 'boolean') {
-        await contextController.save('', { id: form.id, setorDestino: formState.showSectorChange });
+        await contextController.save(undefined, { id: form.id, setorDestino: formState.showSectorChange });
         toast.success('Setor alterado com sucesso!');
       } else if (isApproved) {
         const formCopy = { ...form, tarefas, id: null, descricaoDoProblema: descricaoProblema };

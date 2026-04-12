@@ -60,7 +60,7 @@ export function useSolicitacaoViewModel(): ISolicitacaoViewModel {
   const subscribeRealtime = useCallback(() => {
     const refresher = (payload: any) => {
       createController('solicitacaoDeServico')
-        .read('', payload)
+        .read(undefined, payload)
         .then((ss: any) => { if (ss) dispatch(updateSingleSsRow(ss)); })
         .catch(() => {});
     };

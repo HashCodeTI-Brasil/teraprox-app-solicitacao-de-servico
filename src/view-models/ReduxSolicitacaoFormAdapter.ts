@@ -150,7 +150,7 @@ export function useSolicitacaoFormViewModel(): ISolicitacaoFormViewModel {
 
           return isEmergencial
             ? rootController.post('maquinaParada', payload)
-            : ssController.post('', payload);
+            : ssController.post(undefined, payload);
         }),
       );
 
@@ -188,7 +188,7 @@ export function useSolicitacaoFormViewModel(): ISolicitacaoFormViewModel {
   const handleRemove = useCallback(() => {
     if (!form?.id) return;
     createController('solicitacaoDeServico')
-      .delete('', form.id)
+      .delete(undefined, form.id)
       .then(() => toast.warning(`Solicitação ${form.id} removida.`))
       .catch(() => {});
     dispatch(clearSolicitacaoDeServicoForm());
