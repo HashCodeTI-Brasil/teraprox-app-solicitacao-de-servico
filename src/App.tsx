@@ -79,9 +79,15 @@ const API_ENDPOINT =
 const GATEWAY_HOST =
   process.env.REACT_APP_TERAPROX_GATEWAY_HOST || 'manutencao';
 
-// Só usado em standalone (`npm start` sem shell). Com o core, createController vem do
-// CoreServiceProvider (token, x-teraprox-host, Contexto) — não duplicar política HTTP aqui.
-function makeController(context: string, baseEndPoint?: string) {
+/**
+ * Implementação **local** de `createController` só para `StandaloneProvider`
+ * (dev sem core). Não é a mesma função do host: mesma assinatura que o core
+ * expõe em `CoreService.createController`, injetada aqui como prop do SDK.
+ *
+ * Telas: sempre `useCoreService().createController(...)` — funciona no core e
+ * no standalone, porque ambos preenchem o mesmo `CoreServiceContext`.
+ */
+function createStandaloneController(context: string, baseEndPoint?: string) {
   if (process.env.NODE_ENV !== 'production') {
     if (context === '') return new ArvoreEstruturalFallback();
     if (context === 'branchLevel') return new BranchLevelFallback();
@@ -107,7 +113,7 @@ function StandaloneWrapper({ children }: { children: React.ReactNode }) {
 
   return (
     <StandaloneProvider
-      createController={makeController}
+      createController={createStandaloneController}
       toast={domToast}
       tenant={tenant}
       emulator={RTDB_EMULATOR}
@@ -142,9 +148,6 @@ function AppCore() {
 
 class App extends React.Component {
   render() {
-    const hostedByCore =
-      typeof window !== 'undefined' && !!(window as any).__TERAPROX_HOSTED_BY_CORE__;
-
     const router = createBrowserRouter([
       {
         path: paths.solicitacoesDeServico,
@@ -183,6 +186,10 @@ class App extends React.Component {
         ),
       },
     ]);
+
+    // Mesmo critério que `isHostedByCore()` no core-sdk (FederatedBridge define o flag).
+    const hostedByCore =
+      typeof window !== 'undefined' && !!(window as unknown as { __TERAPROX_HOSTED_BY_CORE__?: boolean }).__TERAPROX_HOSTED_BY_CORE__;
 
     // Em standalone: StandaloneWrapper provê CoreServiceContext + listener RTDB
     // Hospedado pelo Core: o shell injeta o CoreService via FederatedBridge
