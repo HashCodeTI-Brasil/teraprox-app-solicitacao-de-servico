@@ -1,9 +1,13 @@
 import React, { Suspense, lazy } from 'react';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { FetchHttpAdapter, NullHttpController } from 'teraprox-core-sdk';
+import {
+  FetchHttpAdapter,
+  NullHttpController,
+  StandaloneProvider,
+  DevAutoLogin,
+} from 'teraprox-core-sdk';
 import type { ToastService } from 'teraprox-core-sdk';
-import { StandaloneProvider, DevAutoLogin } from 'teraprox-core-sdk/federation';
 import GlobalErrorBoundary from './providers/GlobalErrorBoundary';
 import { logIn, setCompany } from './Reducers/globalConfigReducer';
 import { paths } from './models/constantes';
@@ -75,7 +79,8 @@ const API_ENDPOINT =
 const GATEWAY_HOST =
   process.env.REACT_APP_TERAPROX_GATEWAY_HOST || 'manutencao';
 
-// Factory de controllers HTTP — espelhado do CoreServiceBuilder com fallbacks de dev
+// Só usado em standalone (`npm start` sem shell). Com o core, createController vem do
+// CoreServiceProvider (token, x-teraprox-host, Contexto) — não duplicar política HTTP aqui.
 function makeController(context: string, baseEndPoint?: string) {
   if (process.env.NODE_ENV !== 'production') {
     if (context === '') return new ArvoreEstruturalFallback();

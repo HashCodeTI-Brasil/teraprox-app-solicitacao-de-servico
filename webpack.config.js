@@ -101,10 +101,12 @@ module.exports = {
                 './Manifest':                 './src/federation/manifest',
             },
             shared: {
+                // Mesmo padrão do teraprox-core: eager + singleton evita 2 cópias do SDK
+                // (dois CoreServiceContext → useCoreService ignora o FederatedBridge do host).
                 'teraprox-core-sdk': {
                     singleton: true,
                     requiredVersion: false,
-                    eager: false,
+                    eager: true,
                 },
                 ...(() => {
                     const shared = {};

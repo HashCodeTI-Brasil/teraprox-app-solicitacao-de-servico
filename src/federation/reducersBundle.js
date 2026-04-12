@@ -1,4 +1,4 @@
-import { createReducersFromManifest } from 'teraprox-core-sdk/federation'
+import { createReducersFromManifest } from 'teraprox-core-sdk'
 import { manifest } from './manifest'
 
 const bundle = createReducersFromManifest(

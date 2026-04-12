@@ -1,4 +1,4 @@
-/** @type {import('teraprox-core-sdk/federation').RemoteManifest} */
+/** @type {import('teraprox-core-sdk').RemoteManifest} */
 export const manifest = {
   name: 'teraprox_app_solicitacao',
   version: '1.1.0',
