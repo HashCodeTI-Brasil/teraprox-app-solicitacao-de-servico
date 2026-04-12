@@ -61,7 +61,7 @@ export function useAprovacaoViewModel(): IAprovacaoViewModel {
   // TODO: normalizar API user para que GET /setor = readAll
   useEffect(() => {
     let mounted = true;
-    createController('setor').readAll('setor/all')
+    createController('setor').readAll('all')
       .then((data: any) => {
         const list = Array.isArray(data) ? data : [];
         if (mounted && list.length > 0) {
