@@ -34,7 +34,7 @@ export const setRestApi = (context, baseEndPoint) => {
    http.interceptors.request.use(async (config) => {
       const token = store.getState().global.token;
       if (token) {
-         config.headers.Authorization = `${token}`;
+         config.headers.Authorization = `Bearer ${token}`;
       }
 
       return config;
