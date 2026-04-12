@@ -1,6 +1,9 @@
 /**
- * withWebContext HOC — connects Redux state and CoreService to the wrapped component.
- * Provides: controller, form, state, dispatch, navigate, save, remove, cancelar.
+ * @deprecated withWebContext HOC — RETIRED as of Fase 3 (11-04-2026).
+ * All screens previously using this HOC have been refactored to use ViewModel hooks:
+ *  - SolicitacaoDeServicoForm → useSolicitacaoFormViewModel()
+ *  - AprovacaoStatus          → useAprovacaoViewModel()
+ * This file is kept for historical reference only and can be safely deleted.
  */
 import { useDispatch, useSelector } from 'react-redux';
 import { useCoreService, useToast } from 'teraprox-core-sdk';

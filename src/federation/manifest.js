@@ -9,12 +9,16 @@ export const manifest = {
       items: [
         {
           label: 'Solicitações de Serviço',
-          path: '/solicitacoes',
+          path: '/solicitacoesDeServico',
           module: './SolicitacoesDeServico',
           context: 'solicitacaoDeServico',
         },
       ],
     },
+  ],
+  formRoutes: [
+    { path: '/solicitacaoDeServicoForm', module: './SolicitacaoDeServicoForm', context: 'solicitacaoDeServico' },
+    { path: '/aprovacaoStatus',          module: './AprovacaoStatus',          context: 'solicitacaoDeServico' },
   ],
 }
 

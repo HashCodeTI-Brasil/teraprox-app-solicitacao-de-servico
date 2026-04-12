@@ -348,6 +348,32 @@
   padding: 48px 0;
 }
 
+/* ─── Botão Aprovar ────────────────────────────────────────────────────── */
+.ss-btn-aprovar {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #fff;
+  background-color: #22c55e;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+  white-space: nowrap;
+}
+
+.ss-btn-aprovar:hover {
+  background-color: #16a34a;
+  transform: translateY(-1px);
+}
+
+.ss-btn-aprovar:active {
+  transform: translateY(0);
+}
+
 /* ─── Responsive ───────────────────────────────────────────────────────── */
 @media (max-width: 576px) {
   .ss-root { padding: 10px; }

@@ -182,6 +182,25 @@
 .sf-btn-delete { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
 .sf-btn-delete:hover { background: #fecaca; }
 
+/* ─── Sector Selector Override ───────────────────────────────────────────── */
+.sf-field .sector-selector-floating { width: 100%; }
+.sf-field .sector-selector-floating label { display: none; }
+.sf-field .custom-select-container {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  border-bottom: 1px solid #d1d5db;
+  background: #fff;
+  transition: border-color 0.15s;
+}
+.sf-field .custom-select-container:focus-within { border-color: #3b82f6; }
+.sf-field .selected-sector-label { font-size: 0.875rem; color: #1e293b; padding-left: 0; }
+.sf-field .custom-dropdown-menu {
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
 @media (max-width: 576px) {
   .sf-wrapper { border-radius: 0; }
   .sf-buttons { flex-direction: column-reverse; }

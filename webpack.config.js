@@ -19,9 +19,14 @@ const browserEnv = Object.keys(process.env)
 
 
 module.exports = {
-    entry: './src/index.js',
+    entry: './src/index.tsx',
     mode: isProd ? 'production' : 'development',
-    devtool: isProd ? 'source-map' : 'eval-cheap-module-source-map',
+    // source-map em dev: inline rápido para HMR
+    // hidden-source-map em prod: gera .map externo mas NÃO injeta o comentário
+    // "//# sourceMappingURL=" no bundle público — os .map ficam disponíveis
+    // apenas para upload manual ao servidor RUM (Sentry/Datadog), nunca
+    // expostos ao browser do usuário final.
+    devtool: isProd ? 'hidden-source-map' : 'eval-cheap-module-source-map',
 
     devServer: {
         port: 3004,
@@ -52,17 +57,24 @@ module.exports = {
     },
 
     resolve: {
-        extensions: ['.js', '.jsx'],
+        extensions: ['.ts', '.tsx', '.js', '.jsx'],
     },
 
     module: {
         rules: [
             {
-                test: /\.jsx?$/,
+                test: /\.m?js$/,
+                resolve: { fullySpecified: false },
+            },
+            {
+                test: /\.(t|j)sx?$/,
                 loader: 'babel-loader',
                 exclude: /node_modules/,
                 options: {
-                    presets: [['@babel/preset-react', { runtime: 'automatic' }]],
+                    presets: [
+                        ['@babel/preset-react', { runtime: 'automatic' }],
+                        '@babel/preset-typescript',
+                    ],
                 },
             },
             {
@@ -83,6 +95,7 @@ module.exports = {
             exposes: {
                 './SolicitacoesDeServico':    './src/Screens/SolicitacoesDeServico',
                 './SolicitacaoDeServicoForm': './src/Screens/SolicitacaoDeServicoForm',
+                './AprovacaoStatus':          './src/Screens/AprovacaoStatus',
                 './FederatedBridge':          './src/federation/FederatedBridge',
                 './ReducersBundle':           './src/federation/reducersBundle',
                 './Manifest':                 './src/federation/manifest',
