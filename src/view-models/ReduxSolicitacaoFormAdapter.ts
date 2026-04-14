@@ -216,7 +216,15 @@ export function useSolicitacaoFormViewModel(): ISolicitacaoFormViewModel {
       locais: anexoManager.locais,
       addFiles: anexoManager.addFiles,
       removeLocal: anexoManager.removeLocal,
-      removePersistido: anexoManager.removePersistido,
+      removePersistido: async (anexoId: string | number) => {
+        try {
+          const ssCtrl = createController('solicitacaoDeServico');
+          await ssCtrl.delete('anexo', anexoId);
+        } catch {
+          // fallback to generic delete
+          await anexoManager.removePersistido(anexoId);
+        }
+      },
       getUrl: anexoManager.getUrl,
     },
     setRecursos: dispatchSetRecursos,

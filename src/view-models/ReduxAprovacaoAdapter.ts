@@ -40,6 +40,20 @@ export function useAprovacaoViewModel(): IAprovacaoViewModel {
     port: 'anexo',
   });
 
+  // Track locally removed anexo IDs (for instant UI update before RTDB propagates)
+  const [removedAnexoIds, setRemovedAnexoIds] = useState<Set<string | number>>(new Set());
+
+  // Remove via dedicated endpoint with sentinel → emits RTDB matching object
+  const removeAnexoPersistido = useCallback(async (anexoId: string | number) => {
+    try {
+      await contextController.delete('anexo', anexoId);
+      setRemovedAnexoIds(prev => new Set(prev).add(anexoId));
+    } catch (err) {
+      console.error('[AprovacaoAdapter] Erro ao remover anexo:', err);
+      toast.warning('Erro ao remover anexo');
+    }
+  }, [contextController, toast]);
+
   // ── Local state ───────────────────────────────────────────────────────────
   const [formState, setFormState] = useState<AprovacaoFormState>({
     status: form?.status || '',
@@ -219,10 +233,11 @@ export function useAprovacaoViewModel(): IAprovacaoViewModel {
     }));
   }, [anexosSolicitacao]);
 
-  // Combina: novos uploads (anexoManager) + pré-existentes (API)
-  const anexosPersistidos = anexoManager.persistidos.length > 0
+  // Combina: novos uploads (anexoManager) + pré-existentes (API), filtra removidos
+  const anexosPersistidos = (anexoManager.persistidos.length > 0
     ? anexoManager.persistidos
-    : prePopulatedPersistidos;
+    : prePopulatedPersistidos
+  ).filter((a: any) => !removedAnexoIds.has(a.id));
 
   return {
     form,
@@ -241,7 +256,7 @@ export function useAprovacaoViewModel(): IAprovacaoViewModel {
     carregandoAnexos,
     onAddAnexos: anexoManager.addFiles,
     onRemoveAnexoLocal: anexoManager.removeLocal,
-    onRemoveAnexoPersistido: anexoManager.removePersistido,
+    onRemoveAnexoPersistido: removeAnexoPersistido,
     getAnexoUrl: anexoManager.getUrl,
     dispatchSetDataPlanejada,
     dispatchSetTipoOs,
