@@ -24,7 +24,6 @@ export const createHttpApi = (endPoint, {
     setNeedUserLogin,
     hostedByCore,
 }) => {
-    console.log('[DEBUG createHttpApi] baseURL:', endPoint)
     const http = axios.create({
         baseURL: endPoint,
     })

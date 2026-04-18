@@ -72,7 +72,9 @@ export function useAprovacaoViewModel(): IAprovacaoViewModel {
   // ── Load setores ──────────────────────────────────────────────────────────
   // A API user expõe GET /setor/all (não segue o padrão OnRoad de GET /:context = readAll).
   // Usando path explícito para funcionar tanto via gateway quanto standalone.
-  // TODO: normalizar API user para que GET /setor = readAll
+  // DEBT: teraprox-api-user expõe GET /setor como lista direta;
+  // padronizar como readAll (array em .content) para consistência com demais endpoints.
+  // Por ora mantém-se o tratamento custom neste adapter.
   useEffect(() => {
     let mounted = true;
     createController('setor').readAll('all')
