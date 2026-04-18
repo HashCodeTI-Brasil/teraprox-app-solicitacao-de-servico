@@ -5304,18 +5304,16 @@ tapable@^2.0.0, tapable@^2.3.0:
   resolved "https://registry.npmjs.org/tapable/-/tapable-2.3.2.tgz"
   integrity sha512-1MOpMXuhGzGL5TTCZFItxCc0AARf1EZFQkGqMm7ERKj8+Hgr5oLvJOVFcC+lRmR8hCe2S3jC4T5D7Vg/d7/fhA==
 
-teraprox-core-sdk@^0.3.11, teraprox-core-sdk@^0.3.8:
-  version "0.3.11"
-  resolved "https://registry.npmjs.org/teraprox-core-sdk/-/teraprox-core-sdk-0.3.11.tgz"
-  integrity sha512-VZrEga/v55hBzMtZZDTJRVsd8VBgtPs99+9Sq1a/0KAcXxjgmG/mHtVPssNNN1BZfk9LTKhn9Ca1Dn0XP+6XpQ==
+"teraprox-core-sdk@file:../teraprox-core/packages/core-sdk":
+  version "0.3.13"
+  resolved "file:../teraprox-core/packages/core-sdk"
   dependencies:
     qr-scanner "^1.4.2"
     teraprox-core-sdk "^0.3.8"
 
-teraprox-ui-kit@^0.1.8:
-  version "0.1.8"
-  resolved "https://registry.npmjs.org/teraprox-ui-kit/-/teraprox-ui-kit-0.1.8.tgz"
-  integrity sha512-s9HSUE3QX48m5A1xUtjxrsI3V42ZL336hvxBmFI48NT2jKaKmBlVlpQ+iNT/Je1dNmdhZZMcV/mn1AQarJKfWw==
+"teraprox-ui-kit@file:../teraprox-core/packages/ui-kit":
+  version "0.1.10"
+  resolved "file:../teraprox-core/packages/ui-kit"
 
 terser-webpack-plugin@^5.3.17:
   version "5.4.0"

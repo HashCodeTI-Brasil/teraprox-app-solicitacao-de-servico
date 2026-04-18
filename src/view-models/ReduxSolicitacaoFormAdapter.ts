@@ -20,7 +20,7 @@ export function useSolicitacaoFormViewModel(): ISolicitacaoFormViewModel {
   const navigate = useNavigator();
   const toast = useToast();
   const { createController } = useCoreService();
-  const userController = useHttpController('user', endPointUser);
+  const setorController = useHttpController('setor', endPointUser);
 
   // ── Redux state ─────────────────────────────────────────────────────────
   const form = useSelector((state: RootState) => state.solicitacaoDeServico.form);
@@ -60,29 +60,18 @@ export function useSolicitacaoFormViewModel(): ISolicitacaoFormViewModel {
     }));
   }, [formAnexos]);
 
-  // ── Load setores ─────────────────────────────────────────────────────────
+  // ── Load setores (multi-tenant: busca todos do tenant, sem filtrar por companyId) ──
   useEffect(() => {
     let mounted = true;
-    if (!companyId) {
-      if (mounted && process.env.NODE_ENV !== 'production') {
-        setSetores([
-          { id: 1, nome: 'Manutenção Mecânica' },
-          { id: 2, nome: 'Manutenção Elétrica' },
-          { id: 3, nome: 'Operação' },
-          { id: 4, nome: 'Utilidades' },
-        ]);
-      }
-      return () => { mounted = false; };
-    }
-    userController
-      .get(`findSetoresByCompanyId/${companyId}`)
+    setorController
+      .get('all')
       .then((resp: any) => {
         const list = Array.isArray(resp) ? resp : Array.isArray(resp?.data) ? resp.data : [];
         const filtered = list.filter((i: any) => i?.nome);
         if (mounted) {
           if (filtered.length > 0) {
             setSetores(filtered);
-          } else {
+          } else if (process.env.NODE_ENV !== 'production') {
             setSetores([
               { id: 1, nome: 'Manutenção Mecânica' },
               { id: 2, nome: 'Manutenção Elétrica' },
@@ -103,7 +92,8 @@ export function useSolicitacaoFormViewModel(): ISolicitacaoFormViewModel {
         }
       });
     return () => { mounted = false; };
-  }, [companyId, userController]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     dispatch(setDataAbertura(new Date().toISOString()));

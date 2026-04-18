@@ -8,9 +8,19 @@ import {
   DevAutoLogin,
 } from 'teraprox-core-sdk';
 import type { ToastService } from 'teraprox-core-sdk';
+import { DevShell } from 'teraprox-core-sdk/dev';
+import type { DevRoute } from 'teraprox-core-sdk/dev';
 import GlobalErrorBoundary from './providers/GlobalErrorBoundary';
 import { logIn, setCompany } from './Reducers/globalConfigReducer';
 import { paths } from './models/constantes';
+import { manifest } from './federation/manifest';
+
+const devRoutes: DevRoute[] = [
+  ...(manifest.menuSections || []).flatMap(s =>
+    s.items.map(i => ({ label: i.label, path: i.path, category: s.label }))
+  ),
+  ...(manifest.formRoutes || []).map(r => ({ label: r.path.replace(/^\//, ''), path: r.path, category: 'Formulários' })),
+];
 
 // ─── Toast Adapter (lightweight DOM-based toasts) ────────────────────────────
 class DomToastAdapter implements ToastService {
@@ -195,9 +205,11 @@ class App extends React.Component {
     // Hospedado pelo Core: o shell injeta o CoreService via FederatedBridge
     if (!hostedByCore) {
       return (
-        <StandaloneWrapper>
-          <RouterProvider router={router} />
-        </StandaloneWrapper>
+        <DevShell appName={manifest.name} routes={devRoutes}>
+          <StandaloneWrapper>
+            <RouterProvider router={router} />
+          </StandaloneWrapper>
+        </DevShell>
       );
     }
 

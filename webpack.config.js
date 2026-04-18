@@ -101,12 +101,15 @@ module.exports = {
                 './Manifest':                 './src/federation/manifest',
             },
             shared: {
-                // Mesmo padrão do teraprox-core: eager + singleton evita 2 cópias do SDK
-                // (dois CoreServiceContext → useCoreService ignora o FederatedBridge do host).
+                // eager: false no remote — o host (teraprox-core) é quem carrega eagerly.
+                // Se rodar standalone sem host, o async bootstrap (index.tsx → import('./bootstrap'))
+                // garante que o shared scope já foi inicializado antes do consume.
+                // eager: true no remote causa "Shared module not available for eager consumption"
+                // quando não há host inicializando o scope antes.
                 'teraprox-core-sdk': {
                     singleton: true,
                     requiredVersion: false,
-                    eager: true,
+                    eager: false,
                 },
                 ...(() => {
                     const shared = {};
