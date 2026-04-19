@@ -23,6 +23,7 @@
     "recharts": "^3.8.1",
     "redux": "^4.1.0",
     "redux-persist": "^6.0.0",
+    "@teraprox/ui-kit-sgm": "file:../teraprox-core/packages/ui-kit-sgm",
     "teraprox-core-sdk": "file:../teraprox-core/packages/core-sdk",
     "teraprox-ui-kit": "file:../teraprox-core/packages/ui-kit",
     "uuid": "^13.0.0",

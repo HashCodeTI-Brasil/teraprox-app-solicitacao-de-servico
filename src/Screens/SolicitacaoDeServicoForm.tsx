@@ -1,13 +1,16 @@
 import { Form } from 'react-bootstrap';
-import { SectorSelector, ActionButtons, RecursoDisplayer, AnexoManager } from 'teraprox-ui-kit';
+import { SectorSelector, ActionButtons, AnexoManager } from 'teraprox-ui-kit';
+import { RecursoDisplayer } from '@teraprox/ui-kit-sgm';
 import { formatIsoDate } from '../Services/stringUtils';
 import { useSolicitacaoFormViewModel } from '../view-models/ReduxSolicitacaoFormAdapter';
+import useArvoreControllers from '../hooks/useArvoreControllers';
 import './solicitacaoDeServicoForm.css';
 
 function SolicitacaoDeServicoForm() {
   const vm = useSolicitacaoFormViewModel();
   const { form, anexos } = vm;
   const recursos = form?.recursos || [];
+  const arvoreControllers = useArvoreControllers();
 
   return (
     <div className="sf-wrapper">
@@ -22,6 +25,7 @@ function SolicitacaoDeServicoForm() {
           <RecursoDisplayer
             selectedList={recursos}
             onSaveRecurso={(list) => vm.setRecursos(list)}
+            {...arvoreControllers}
           />
           {recursos.length > 0 && (
             <div className="sf-recurso-chips">
