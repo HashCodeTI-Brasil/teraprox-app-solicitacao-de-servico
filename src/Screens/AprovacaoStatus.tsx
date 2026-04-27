@@ -5,15 +5,6 @@
  */
 import React, { useEffect, useRef, useState } from "react"
 import {
-  Alert,
-  Badge,
-  Card,
-  Col,
-  Container,
-  Form,
-  Row,
-} from "react-bootstrap"
-import {
   FaCheck,
   FaClock,
   FaCog,
@@ -66,7 +57,7 @@ function MantenedorPicker({
       />
       {selected && (
         <div className="d-flex align-items-center gap-2 mt-2">
-          <Badge bg="secondary" className="d-flex align-items-center gap-1">
+          <span className="badge bg-secondary d-flex align-items-center gap-1">
             {getLabel(selected)}
             <FaTimes
               size={10}
@@ -74,7 +65,7 @@ function MantenedorPicker({
               onClick={onClear}
               title="Remover mantenedor"
             />
-          </Badge>
+          </span>
         </div>
       )}
       {lista.length === 0 && options.length === 0 && (
@@ -132,13 +123,18 @@ const AprovacaoStatus = () => {
       PENDENTE:  { variant: "warning", icon: FaClock,  text: "Pendente"  },
     }
     const { variant, icon: Icon, text } = config[status] || config.PENDENTE
-    return <Badge bg={variant} className="status-badge d-flex align-items-center gap-2"><Icon size={14} />{text}</Badge>
+    return (
+      <span className={`status-badge badge bg-${variant} d-flex align-items-center gap-2`}>
+        <Icon size={14} />
+        {text}
+      </span>
+    )
   }
 
   const ValidationAlert = ({ errors }: { errors: string[] }) => {
     if (!errors.length) return null
     return (
-      <Alert variant="warning" className="fade-in">
+      <div className="alert alert-warning fade-in" role="alert">
         <div className="d-flex align-items-start gap-2">
           <FaExclamationTriangle className="mt-1" />
           <div>
@@ -146,32 +142,32 @@ const AprovacaoStatus = () => {
             <ul className="mb-0 mt-2">{errors.map((e, i) => <li key={i}>{e}</li>)}</ul>
           </div>
         </div>
-      </Alert>
+      </div>
     )
   }
 
   return (
-    <Container fluid className="py-4 aprovacao-status-container">
-      <Row className="g-4">
-        <Col lg={8}>
+    <div className="container-fluid py-4 aprovacao-status-container">
+      <div className="row g-4">
+        <div className="col-lg-8">
           {/* Card Principal */}
-          <Card
+          <div
             id="aprovacao-card-status"
             ref={(el: HTMLDivElement | null) => { elementRefs.current["status"] = el }}
-            className="mb-4 status-card fade-in"
+            className="card mb-4 status-card fade-in"
           >
-            <Card.Header className="card-header-primary text-white">
+            <div className="card-header card-header-primary text-white">
               <h5 className="mb-0 d-flex align-items-center gap-2">
                 <FaCog /> Aprovação de Solicitação
                 {hasStatus && <StatusBadge status={formState.status} />}
               </h5>
-            </Card.Header>
-            <Card.Body>
+            </div>
+            <div className="card-body">
               {submitAttempted && !(formState.showSectorChange || isRejected) && <ValidationAlert errors={vm.validationErrors} />}
 
               {/* Seleção de Status */}
-              <Row className="mb-3">
-                <Col hidden={!!formState.showSectorChange} md={6}>
+              <div className="row mb-3">
+                <div className={`col-md-6${formState.showSectorChange ? " d-none" : ""}`}>
                   <AutoComplete
                     onSelectedClick={vm.handleStatusChange}
                     loadCondition={true}
@@ -179,57 +175,71 @@ const AprovacaoStatus = () => {
                     ops={["APROVADO", "REPROVADO"]}
                     value={formState.status}
                   />
-                </Col>
+                </div>
                 {formState.showSectorChange && (
-                  <Col md={6}>
+                  <div className="col-md-6">
                     <SectorSelector
                       setores={vm.setores}
                       onSectorSelect={(setor: Sector) => vm.handleSectorSelect(setor)}
                     />
-                  </Col>
+                  </div>
                 )}
-              </Row>
+              </div>
 
               {/* Opções Adicionais */}
               {!isRejected && (
-                <Row className="mb-3">
-                  <Col hidden={!!formState.showSectorChange} md={4}>
-                    <Form.Check
-                      type="switch"
-                      label="Definir Data Planejada"
-                      checked={formState.showDateField}
-                      onChange={(e) => vm.handleDateFieldToggle(e.target.checked)}
-                    />
-                  </Col>
-                  <Col md={4}>
-                    <Form.Check
-                      type="switch"
-                      label="Alterar Setor Responsável"
-                      checked={!!formState.showSectorChange}
-                      onChange={(e) => vm.handleSectorChange(e.target.checked)}
-                    />
-                  </Col>
-                </Row>
+                <div className="row mb-3">
+                  <div className={`col-md-4${formState.showSectorChange ? " d-none" : ""}`}>
+                    <div className="form-check form-switch">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="aprovacao-switch-data"
+                        checked={formState.showDateField}
+                        onChange={(e) => vm.handleDateFieldToggle(e.target.checked)}
+                      />
+                      <label className="form-check-label" htmlFor="aprovacao-switch-data">
+                        Definir Data Planejada
+                      </label>
+                    </div>
+                  </div>
+                  <div className="col-md-4">
+                    <div className="form-check form-switch">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="aprovacao-switch-setor"
+                        checked={!!formState.showSectorChange}
+                        onChange={(e) => vm.handleSectorChange(e.target.checked)}
+                      />
+                      <label className="form-check-label" htmlFor="aprovacao-switch-setor">
+                        Alterar Setor Responsável
+                      </label>
+                    </div>
+                  </div>
+                </div>
               )}
 
               {/* Campo de Data Planejada */}
               {formState.showDateField && (
-                <Row className="mb-3">
-                  <Col md={6}>
+                <div className="row mb-3">
+                  <div className="col-md-6">
                     <FormField
                       ty="datetime-local"
                       label="Data Planejada"
                       onValueUpdate={(v) => vm.dispatchSetDataPlanejada(v ? new Date(v).toISOString() : undefined)}
                       val={formatIsoDate(form.dataPlanejada) ?? undefined}
                     />
-                  </Col>
-                </Row>
+                  </div>
+                </div>
               )}
 
               {/* Motivo da Reprovação */}
               {isRejected && (
-                <Row className="mb-3">
-                  <Col>
+                <div className="row mb-3">
+                  <div className="col">
                     <FormField
                       val={vm.justificativa?.descricao}
                       asTextArea
@@ -237,19 +247,19 @@ const AprovacaoStatus = () => {
                       onValueUpdate={(v) => vm.dispatchSetDescricaoJustificativa(v)}
                       rows={4}
                     />
-                  </Col>
-                </Row>
+                  </div>
+                </div>
               )}
-            </Card.Body>
-          </Card>
+            </div>
+          </div>
 
           {/* Card Configuração OS (só quando Aprovado) */}
           {!formState.showSectorChange && isApproved && (
-            <Card className="mb-4 status-card fade-in">
-              <Card.Header><h6 className="mb-0">Configuração da Ordem de Serviço</h6></Card.Header>
-              <Card.Body>
-                <Row className="mb-3">
-                  <Col>
+            <div className="card mb-4 status-card fade-in">
+              <div className="card-header"><h6 className="mb-0">Configuração da Ordem de Serviço</h6></div>
+              <div className="card-body">
+                <div className="row mb-3">
+                  <div className="col">
                     <FormField
                       asTextArea
                       label="Descrição do problema"
@@ -257,33 +267,33 @@ const AprovacaoStatus = () => {
                       val={descricao}
                       onValueUpdate={setDescricao}
                     />
-                  </Col>
-                </Row>
-                <Row className="mb-3">
-                  <Col>
+                  </div>
+                </div>
+                <div className="row mb-3">
+                  <div className="col">
                     <TipoDeOrdemSelector
                       onSelect={(tipo: any) => vm.dispatchSetTipoOs(tipo)}
                       selectedValue={form?.osTipos}
                     />
-                  </Col>
-                </Row>
-                <Row className="mb-3">
-                  <Col>
+                  </div>
+                </div>
+                <div className="row mb-3">
+                  <div className="col">
                     <MantenedorPicker
                       selected={form?.osMantenedor ?? form?.mantenedores?.[0]}
                       onSelect={vm.dispatchSetMantenedor}
                       onClear={vm.dispatchClearMantenedor}
                     />
-                  </Col>
-                </Row>
-              </Card.Body>
-            </Card>
+                  </div>
+                </div>
+              </div>
+            </div>
           )}
 
           {/* Card Anexos */}
-          <Card className="mb-4 status-card fade-in">
-            <Card.Header><h6 className="mb-0">Anexos</h6></Card.Header>
-            <Card.Body>
+          <div className="card mb-4 status-card fade-in">
+            <div className="card-header"><h6 className="mb-0">Anexos</h6></div>
+            <div className="card-body">
               <AnexoManager
                 persistidos={vm.anexosPersistidos as AnexoPersistedItem[]}
                 locais={vm.anexosLocais}
@@ -291,23 +301,28 @@ const AprovacaoStatus = () => {
                 onAddFiles={isRejected ? undefined : vm.onAddAnexos}
                 onRemoveLocal={isRejected ? undefined : vm.onRemoveAnexoLocal}
                 onRemovePersistido={isRejected ? undefined : vm.onRemoveAnexoPersistido}
+                getImageReadUrl={async (anexo) => {
+                  const a = anexo as any
+                  return a.url || a.signedUrl || (await vm.getAnexoUrl(a.id, a.key).catch(() => ''))
+                }}
                 onDownload={async (anexo) => {
-                  const url = (anexo as any).url
-                    || await vm.getAnexoUrl((anexo as any).id).catch(() => '')
+                  const a = anexo as any
+                  const url = a.url
+                    || await vm.getAnexoUrl(a.id, a.key).catch(() => '')
                   if (url) window.open(url, '_blank')
                 }}
                 readonly={isRejected}
                 maxFiles={5}
               />
-            </Card.Body>
-          </Card>
-        </Col>
+            </div>
+          </div>
+        </div>
 
         {/* Sidebar Resumo */}
-        <Col lg={4}>
-          <Card className="mb-4 status-card">
-            <Card.Header><h6 className="mb-0">Resumo da Solicitação</h6></Card.Header>
-            <Card.Body>
+        <div className="col-lg-4">
+          <div className="card mb-4 status-card">
+            <div className="card-header"><h6 className="mb-0">Resumo da Solicitação</h6></div>
+            <div className="card-body">
               <p><strong>ID:</strong> #{form?.id}</p>
               <p><strong>Status Atual:</strong> {form?.status || "—"}</p>
               <p><strong>Solicitante:</strong> {form?.solicitante || "—"}</p>
@@ -319,8 +334,8 @@ const AprovacaoStatus = () => {
                   <TextWithMore text={form.descricaoDoProblema} maxLength={120} />
                 </div>
               )}
-            </Card.Body>
-          </Card>
+            </div>
+          </div>
 
           <ActionButtons
             disabled={vm.isSubmitting}
@@ -332,9 +347,9 @@ const AprovacaoStatus = () => {
             isEditing={true}
             onCancelEdit={() => navigate(paths.solicitacoesDeServico)}
           />
-        </Col>
-      </Row>
-    </Container>
+        </div>
+      </div>
+    </div>
   )
 }
 

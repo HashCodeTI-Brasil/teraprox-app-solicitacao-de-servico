@@ -1,6 +1,6 @@
-import { Form } from 'react-bootstrap';
 import { SectorSelector, ActionButtons, AnexoManager } from 'teraprox-ui-kit';
 import { RecursoDisplayer } from '@teraprox/ui-kit-sgm';
+import { useRecursoDisplayerViewModel } from 'teraprox-core-sdk';
 import { formatIsoDate } from '../Services/stringUtils';
 import { useSolicitacaoFormViewModel } from '../view-models/ReduxSolicitacaoFormAdapter';
 import useArvoreControllers from '../hooks/useArvoreControllers';
@@ -11,6 +11,7 @@ function SolicitacaoDeServicoForm() {
   const { form, anexos } = vm;
   const recursos = form?.recursos || [];
   const arvoreControllers = useArvoreControllers();
+  const recursoVm = useRecursoDisplayerViewModel(arvoreControllers);
 
   return (
     <div className="sf-wrapper">
@@ -25,7 +26,7 @@ function SolicitacaoDeServicoForm() {
           <RecursoDisplayer
             selectedList={recursos}
             onSaveRecurso={(list) => vm.setRecursos(list)}
-            {...arvoreControllers}
+            vm={recursoVm}
           />
           {recursos.length > 0 && (
             <div className="sf-recurso-chips">
@@ -85,20 +86,24 @@ function SolicitacaoDeServicoForm() {
           <label className="sf-label"><strong>Solicitação emergencial?</strong></label>
           <div className="sf-hint">Ex: máquina parada, linha parada</div>
           <div className="sf-radio-group">
-            <Form.Check
-              type="radio"
-              id="emergencial-sim"
-              label="Sim"
-              checked={vm.emergencial === 'Y'}
-              onChange={() => vm.setEmergencial('Y')}
-            />
-            <Form.Check
-              type="radio"
-              id="emergencial-nao"
-              label="Não"
-              checked={vm.emergencial === 'N'}
-              onChange={() => vm.setEmergencial('N')}
-            />
+            <label className="sf-radio-label">
+              <input
+                type="radio"
+                id="emergencial-sim"
+                checked={vm.emergencial === 'Y'}
+                onChange={() => vm.setEmergencial('Y')}
+              />
+              {' '}Sim
+            </label>
+            <label className="sf-radio-label">
+              <input
+                type="radio"
+                id="emergencial-nao"
+                checked={vm.emergencial === 'N'}
+                onChange={() => vm.setEmergencial('N')}
+              />
+              {' '}Não
+            </label>
           </div>
         </div>
 
@@ -109,17 +114,26 @@ function SolicitacaoDeServicoForm() {
             persistidos={anexos.persistidos.map((a: any, i: number) => ({
               id: a.id || `p-${i}`,
               nome: a.nome || a.name || `Anexo ${i + 1}`,
+              originalName: a.originalName || a.nome,
+              mimeType: a.mimeType || a.contentType,
               tipo: a.tipo || a.type || a.contentType || '',
               tamanho: a.tamanho || a.size,
               url: a.url || a.signedUrl,
+              signedUrl: a.signedUrl,
+              key: a.key,
               createdAt: a.createdAt,
             }))}
             locais={anexos.locais}
             onAddFiles={anexos.addFiles}
             onRemoveLocal={anexos.removeLocal}
             onRemovePersistido={anexos.removePersistido}
+            getImageReadUrl={async (anexo) => {
+              const a = anexo as any
+              return a.url || a.signedUrl || (await anexos.getUrl(a.id, a.key).catch(() => ''))
+            }}
             onDownload={async (anexo) => {
-              const url = (anexo as any).url || await anexos.getUrl((anexo as any).id);
+              const a = anexo as any
+              const url = a.url || await anexos.getUrl(a.id, a.key);
               if (url) window.open(url, '_blank');
             }}
             maxFiles={5}

@@ -2,6 +2,7 @@
 export const manifest = {
   name: 'teraprox_app_solicitacao',
   version: '1.1.0',
+  menuGroup: { name: 'SGM', icon: 'FaTools', order: 10 },
   defaultReducers: ['globalError', 'notification', 'picker', 'pickers', 'timer'],
   menuSections: [
     {

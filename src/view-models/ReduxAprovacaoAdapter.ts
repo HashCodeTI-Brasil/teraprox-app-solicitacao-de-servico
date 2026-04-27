@@ -33,12 +33,13 @@ export function useAprovacaoViewModel(): IAprovacaoViewModel {
 
   const contextController = useMemo(() => createController('solicitacaoDeServico'), [createController]);
 
-  // ── Anexo manager — upload/download de anexos da SS em aprovação ──────────
+  // ── Anexo manager — mesmo contrato que ReduxSolicitacaoFormAdapter (NÃO passar
+  //    `port` como string: quebra getPort() e impede intent/upload/readByEntity).
   const anexoManager = useAnexoManager({
     entityId: form?.id ?? '0',
     context: 'solicitacaoDeServico',
-    port: 'anexo',
   });
+  const { uploadAll: uploadAnexosPendentes } = anexoManager;
 
   // Track locally removed anexo IDs (for instant UI update before RTDB propagates)
   const [removedAnexoIds, setRemovedAnexoIds] = useState<Set<string | number>>(new Set());
@@ -187,7 +188,39 @@ export function useAprovacaoViewModel(): IAprovacaoViewModel {
         await contextController.save(undefined, { id: form.id, setorDestino: formState.showSectorChange });
         toast.success('Setor alterado com sucesso!');
       } else if (isApproved) {
-        const formCopy = { ...form, tarefas, id: null, descricaoDoProblema: descricaoProblema };
+        // 1) Ficheiros novos ainda em fila (AnexoManager) — upload para a SS antes de aprovar
+        if (form?.id) {
+          await uploadAnexosPendentes();
+        }
+        // 2) Releitura: anexos com `key` (OrdemDeServicoService.createBySolicitacaoId exige `key` p/ clonar p/ OS)
+        let anexosComKey: any[] = []
+        if (form?.id) {
+          try {
+            const latest: any = await contextController.read(undefined, form.id)
+            const fromApi = Array.isArray(latest?.anexos) ? latest.anexos : []
+            anexosComKey = fromApi.filter((a: any) => a?.key && !removedAnexoIds.has(a.id))
+          } catch (e) {
+            console.error('[AprovacaoAdapter] Falha ao reler anexos após upload:', e)
+            const fallback = [
+              ...((Array.isArray(anexosSolicitacao) ? anexosSolicitacao : []) as any[]),
+              ...((anexoManager.persistidos as any[]) || []),
+            ]
+            const seen = new Set<string>()
+            anexosComKey = fallback.filter((a: any) => {
+              if (!a?.key || removedAnexoIds.has(a.id)) return false
+              if (seen.has(a.key)) return false
+              seen.add(a.key)
+              return true
+            })
+          }
+        }
+        const formCopy = {
+          ...form,
+          tarefas,
+          id: null,
+          descricaoDoProblema: descricaoProblema,
+          ...(anexosComKey.length > 0 ? { anexos: anexosComKey } : {}),
+        };
         await contextController.post(`aprovaSolicitacao/${form.id}`, formCopy);
         toast.success('Solicitação aprovada com sucesso!');
       } else if (isRejected) {
@@ -205,7 +238,7 @@ export function useAprovacaoViewModel(): IAprovacaoViewModel {
     } finally {
       setIsSubmitting(false);
     }
-  }, [validationErrors, formState, isApproved, isRejected, form, tarefas, justificativa, contextController, navigate, toast]);
+  }, [validationErrors, formState, isApproved, isRejected, form, tarefas, justificativa, contextController, navigate, toast, uploadAnexosPendentes, anexosSolicitacao, anexoManager, removedAnexoIds]);
 
   const handleCancel = useCallback(() => {
     navigate(paths.solicitacoesDeServico);

@@ -34,7 +34,7 @@ export interface IAprovacaoViewModel {
   onAddAnexos(files: File[]): void;
   onRemoveAnexoLocal(localId: string): void;
   onRemoveAnexoPersistido(id: string | number): Promise<void>;
-  getAnexoUrl(id: string | number): Promise<string>;
+  getAnexoUrl(id: string | number, key?: string): Promise<string>;
 
   // ── Redux field dispatchers ─────────────────────────────────────────────
   dispatchSetDataPlanejada(iso: string | undefined): void;

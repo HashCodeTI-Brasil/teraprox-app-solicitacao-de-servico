@@ -1,6 +1,5 @@
 import './solicitacoesDeServico.css';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Spinner } from 'react-bootstrap';
 import { FiRefreshCw, FiPlus, FiSearch, FiFilter, FiX } from 'react-icons/fi';
 import { MdOutlineAssignmentLate } from 'react-icons/md';
 import { getStatusColor } from '../models/constantes';
@@ -292,7 +291,7 @@ function SolicitacoesDeServico() {
             disabled={vm.loading}
             title="Atualizar"
           >
-            {vm.loading ? <Spinner size="sm" animation="border" /> : <FiRefreshCw size={18} />}
+            {vm.loading ? <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" /> : <FiRefreshCw size={18} />}
           </button>
           <button className="ss-btn-primary" onClick={vm.handleNovaClick} title="Nova Solicitação">
             <FiPlus size={16} />
@@ -350,7 +349,11 @@ function SolicitacoesDeServico() {
       {/* List */}
       <div className="ss-list">
         {vm.loading && filteredList.length === 0 ? (
-          <div className="ss-loading"><Spinner animation="border" /></div>
+          <div className="ss-loading" role="status" aria-label="A carregar">
+            <div className="spinner-border text-primary">
+              <span className="visually-hidden">A carregar...</span>
+            </div>
+          </div>
         ) : filteredList.length === 0 ? (
           <EmptyState />
         ) : (

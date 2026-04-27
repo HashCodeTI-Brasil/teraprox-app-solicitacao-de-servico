@@ -1,5 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'teraprox-ui-kit/index.css';
+import '@teraprox/ui-kit-core/dist/index.css';
 import React, { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';

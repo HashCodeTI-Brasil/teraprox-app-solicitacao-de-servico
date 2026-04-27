@@ -106,9 +106,30 @@ module.exports = {
                 // garante que o shared scope já foi inicializado antes do consume.
                 // eager: true no remote causa "Shared module not available for eager consumption"
                 // quando não há host inicializando o scope antes.
+                //
+                // ─── Core SDK + UI kits (singletons cross-remote) ─────────
+                // Fix da sprint "Afinar o Split" (Track B.2): SGM-SS não declarava
+                // teraprox-ui-kit / ui-kit-core / ui-kit-sgm — podia carregar
+                // versão local fora do singleton. requiredVersion caret-range
+                // alinhado ao host.
                 'teraprox-core-sdk': {
                     singleton: true,
-                    requiredVersion: false,
+                    requiredVersion: '^0.3.0',
+                    eager: false,
+                },
+                'teraprox-ui-kit': {
+                    singleton: true,
+                    requiredVersion: '^0.2.0',
+                    eager: false,
+                },
+                '@teraprox/ui-kit-core': {
+                    singleton: true,
+                    requiredVersion: '^0.1.0',
+                    eager: false,
+                },
+                '@teraprox/ui-kit-sgm': {
+                    singleton: true,
+                    requiredVersion: '^0.1.0',
                     eager: false,
                 },
                 ...(() => {
@@ -129,7 +150,7 @@ module.exports = {
                         if (deps[pkg]) {
                             shared[pkg] = {
                                 singleton: true,
-                                requiredVersion: false,
+                                requiredVersion: deps[pkg],
                                 // eager: false → shared libs são lazy por padrão,
                                 // o core carrega a instância singleton; esse remote
                                 // reutiliza sem re-download
