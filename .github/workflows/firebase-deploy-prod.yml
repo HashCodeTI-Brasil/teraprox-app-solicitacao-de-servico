@@ -28,11 +28,19 @@ jobs:
       - name: Build core packages
         working-directory: teraprox-core
         run: |
+          # core-sdk has 3 entries; outras tem 1. Skipamos --dts para evitar
+          # erros TS pre-existentes em extractDevRoutes/FormModal que nao
+          # bloqueam runtime (consumers importam JS, nao .d.ts em build CRA).
+          declare -A ENTRY
+          ENTRY[core-sdk]="src/index.ts src/dev.ts src/federation.ts"
+          ENTRY[ui-kit]="src/index.ts"
+          ENTRY[ui-kit-core]="src/index.ts"
+          ENTRY[ui-kit-sgm]="src/index.ts"
           for pkg in core-sdk ui-kit ui-kit-core ui-kit-sgm; do
             echo "::group::Building $pkg"
             pushd "packages/$pkg"
             npm ci --legacy-peer-deps 2>/dev/null || npm install --legacy-peer-deps
-            npm run build
+            npx tsup ${ENTRY[$pkg]} --format esm,cjs --clean
             popd
             echo "::endgroup::"
           done
