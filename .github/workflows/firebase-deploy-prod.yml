@@ -25,18 +25,26 @@ jobs:
           cache: npm
           cache-dependency-path: teraprox-SGM-SS/package-lock.json
 
+      # Install root teraprox-core deps — popula teraprox-core/node_modules
+      # com qr-scanner, react-dom, file-saver, etc. que sao peerDeps de
+      # ui-kit. O webpack do MF resolve via walk-up de ui-kit/dist.
+      - name: Install root teraprox-core dependencies
+        working-directory: teraprox-core
+        run: npm ci --legacy-peer-deps 2>/dev/null || npm install --legacy-peer-deps
+
       - name: Build core packages
         working-directory: teraprox-core
         run: |
-          # core-sdk has 3 entries; outras tem 1. Skipamos --dts para evitar
-          # erros TS pre-existentes em extractDevRoutes/FormModal que nao
-          # bloqueam runtime (consumers importam JS, nao .d.ts em build CRA).
+          # Skipamos --dts para evitar erros TS pre-existentes em
+          # extractDevRoutes/FormModal que nao bloqueam runtime
+          # (consumers importam JS, nao .d.ts em build CRA).
           declare -A ENTRY
           ENTRY[core-sdk]="src/index.ts src/dev.ts src/federation.ts"
           ENTRY[ui-kit]="src/index.ts"
           ENTRY[ui-kit-core]="src/index.ts"
           ENTRY[ui-kit-sgm]="src/index.ts"
-          for pkg in core-sdk ui-kit ui-kit-core ui-kit-sgm; do
+          ENTRY[ui-kit-sgp]="src/index.ts"
+          for pkg in core-sdk ui-kit ui-kit-core ui-kit-sgm ui-kit-sgp; do
             echo "::group::Building $pkg"
             pushd "packages/$pkg"
             npm ci --legacy-peer-deps 2>/dev/null || npm install --legacy-peer-deps
