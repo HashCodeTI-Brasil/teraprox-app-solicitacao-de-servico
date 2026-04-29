@@ -38,9 +38,12 @@ jobs:
           # MF (CRA) precisa do .d.ts para type-check de imports tipo
           # \'import type *** DevRoute *** from "teraprox-core-sdk/dev"\'.
           # core-sdk/tsconfig agora tem lib ES2019 (flatMap).
+          # rm -rf dist forca clean antes do tsup --dts (committed dist
+          # files no git colidem com tsc TS5055 \'overwrite input file\').
           for pkg in core-sdk ui-kit ui-kit-core ui-kit-sgm ui-kit-sgp; do
             echo "::group::Building $pkg"
             pushd "packages/$pkg"
+            rm -rf dist
             npm ci --legacy-peer-deps 2>/dev/null || npm install --legacy-peer-deps
             npm run build
             popd
