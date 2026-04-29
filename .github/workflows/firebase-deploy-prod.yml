@@ -9,16 +9,40 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: teraprox-SGM-SS
+
+      - uses: actions/checkout@v4
+        with:
+          repository: HashCodeTI-Brasil/teraprox-core
+          token: ${{ secrets.CORE_REPO_PAT }}
+          path: teraprox-core
+          ref: gcp-migration
 
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
+          cache-dependency-path: teraprox-SGM-SS/package-lock.json
 
-      - name: Install dependencies
+      - name: Build core packages
+        working-directory: teraprox-core
+        run: |
+          for pkg in core-sdk ui-kit ui-kit-core ui-kit-sgm; do
+            echo "::group::Building $pkg"
+            pushd "packages/$pkg"
+            npm ci --legacy-peer-deps 2>/dev/null || npm install --legacy-peer-deps
+            npm run build
+            popd
+            echo "::endgroup::"
+          done
+
+      - name: Install MF dependencies
+        working-directory: teraprox-SGM-SS
         run: npm ci --legacy-peer-deps || npm install --legacy-peer-deps
 
-      - name: Build
+      - name: Build MF
+        working-directory: teraprox-SGM-SS
         env:
           REACT_APP_FIREBASE_CONFIG: ${{ secrets.REACT_APP_FIREBASE_CONFIG }}
         run: npm run build
@@ -31,3 +55,4 @@ jobs:
           projectId: teraprox
           channelId: live
           target: teraprox-solicitacoes
+          entryPoint: teraprox-SGM-SS
