@@ -6,14 +6,18 @@ export const manifest = {
   defaultReducers: ['globalError', 'notification', 'picker', 'pickers', 'timer'],
   menuSections: [
     {
-      label: 'Solicitações',
-      icon: 'FaClipboardCheck',
+      group: 'SGM',
+      label: 'Manutenção',
+      icon: 'FaClipboardList',
+      order: 10, // ordem da sub-section dentro de SGM
       items: [
         {
           label: 'Solicitações de Serviço',
           path: '/solicitacoesDeServico',
           module: './SolicitacoesDeServico',
           context: 'solicitacaoDeServico',
+          icon: 'FaClipboardCheck',
+          order: 10, // dentro de Manutenção: SS=10, OS=20, OM=30
           reducers: ['solicitacaoDeServico'],
         },
       ],
