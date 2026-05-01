@@ -4,6 +4,9 @@ import { StatusSolicitacao } from 'teraprox-core-sdk';
 export const paths = {
   solicitacoesDeServico: '/solicitacoesDeServico',
   solicitacaoDeServicoForm: '/solicitacaoDeServicoForm',
+  // Read-only por id — destino dos chips "SS #X" do OsCard cross-MF.
+  // Padrão `/solicitacao/:id` (sem o sufixo "DeServico" para URL mais curta).
+  solicitacaoDeServicoView: '/solicitacao/:id',
   aprovaStatus: '/aprovacaoStatus',
   login: '/Login',
 } as const;

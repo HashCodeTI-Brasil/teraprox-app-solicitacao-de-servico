@@ -95,6 +95,7 @@ module.exports = {
             exposes: {
                 './SolicitacoesDeServico':    './src/Screens/SolicitacoesDeServico',
                 './SolicitacaoDeServicoForm': './src/Screens/SolicitacaoDeServicoForm',
+                './SolicitacaoDeServicoView': './src/Screens/SolicitacaoDeServicoView',
                 './AprovacaoStatus':          './src/Screens/AprovacaoStatus',
                 './FederatedBridge':          './src/federation/FederatedBridge',
                 './ReducersBundle':           './src/federation/reducersBundle',

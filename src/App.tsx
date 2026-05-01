@@ -136,6 +136,7 @@ function StandaloneWrapper({ children }: { children: React.ReactNode }) {
 // ─── Lazy screens ────────────────────────────────────────────────────────────
 const SolicitacoesDeServico    = lazy(() => import('./Screens/SolicitacoesDeServico'));
 const SolicitacaoDeServicoForm = lazy(() => import('./Screens/SolicitacaoDeServicoForm'));
+const SolicitacaoDeServicoView = lazy(() => import('./Screens/SolicitacaoDeServicoView'));
 const AprovacaoStatus          = lazy(() => import('./Screens/AprovacaoStatus'));
 
 const Fallback = () => (
@@ -173,6 +174,16 @@ class App extends React.Component {
           <DevAutoLogin actions={{ logIn, setCompany }}>
             <Suspense fallback={<Fallback />}>
               <SolicitacaoDeServicoForm />
+            </Suspense>
+          </DevAutoLogin>
+        ),
+      },
+      {
+        path: paths.solicitacaoDeServicoView,
+        element: (
+          <DevAutoLogin actions={{ logIn, setCompany }}>
+            <Suspense fallback={<Fallback />}>
+              <SolicitacaoDeServicoView />
             </Suspense>
           </DevAutoLogin>
         ),

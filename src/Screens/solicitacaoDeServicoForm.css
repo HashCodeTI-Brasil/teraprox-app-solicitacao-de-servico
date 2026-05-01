@@ -34,6 +34,19 @@
 .sf-required { color: #ef4444; margin-left: 2px; }
 .sf-hint { font-size: 0.78rem; color: #94a3b8; }
 
+/* Valor read-only — usado por SolicitacaoDeServicoView (/solicitacao/:id) */
+.sf-readonly-value {
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #f9fafb;
+  color: #1e293b;
+  font-size: 0.9rem;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+}
+
 .sf-input,
 .sf-select,
 .sf-textarea {

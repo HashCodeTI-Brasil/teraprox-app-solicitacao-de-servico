@@ -30,6 +30,14 @@ export const manifest = {
       context: 'solicitacaoDeServico',
       reducers: ['solicitacaoDeServico', 'tarefa'],
     },
+    // Read-only por id — destino do chip "SS #X" em OsCard cross-MF.
+    // Não dispara dispatch para o reducer de form: tela faz fetch direto por id.
+    {
+      path: '/solicitacao/:id',
+      module: './SolicitacaoDeServicoView',
+      context: 'solicitacaoDeServico',
+      reducers: [],
+    },
     {
       path: '/aprovacaoStatus',
       module: './AprovacaoStatus',
