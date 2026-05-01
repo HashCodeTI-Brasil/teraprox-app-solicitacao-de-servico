@@ -2,10 +2,12 @@ import './solicitacoesDeServico.css';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FiRefreshCw, FiPlus, FiSearch, FiFilter, FiX } from 'react-icons/fi';
 import { MdOutlineAssignmentLate } from 'react-icons/md';
+import { useSearchParams } from 'react-router-dom';
 import { getStatusColor } from '../models/constantes';
 import { formatShortDate, formatDate } from '../Services/stringUtils';
 import { StatusPills, PeriodSelector } from 'teraprox-ui-kit';
 import { useSolicitacaoViewModel } from '../view-models/ReduxSolicitacaoAdapter';
+import useNavigator from '../hooks/useNavigator';
 
 // ─── Status pills configuration ───────────────────────────────────────────
 const STATUS_PILLS = ['PENDENTE', 'APROVADO', 'REPROVADO', 'CANCELADO', 'EM_EXECUCAO'];
@@ -28,19 +30,25 @@ function SolicitacaoCard({
   solicitacao,
   onCardClick,
   onAprovarClick,
+  onViewOs,
+  highlight,
 }: {
   solicitacao: any;
   onCardClick?: (ss: any) => void;
   onAprovarClick?: (ss: any) => void;
+  onViewOs?: (osId: number | string) => void;
+  highlight?: boolean;
 }) {
   const cor = getStatusColor(solicitacao.status);
   const recursoNome = solicitacao.recurso?.nome || solicitacao.recursoNome || '';
   const dateText = formatShortDate(solicitacao.dataDeAbertura);
   const isPendente = solicitacao.status?.toUpperCase() === 'PENDENTE';
+  const osGerada = solicitacao.ordemDeServico;
+  const osId = osGerada?.id;
 
   return (
     <div
-      className="ss-card"
+      className={`ss-card${highlight ? ' ss-card--highlight' : ''}`}
       role="button"
       tabIndex={0}
       onClick={() => onCardClick && onCardClick(solicitacao)}
@@ -63,6 +71,26 @@ function SolicitacaoCard({
         {solicitacao.descricaoDoProblema ? (
           <p className="ss-card-desc">{solicitacao.descricaoDoProblema}</p>
         ) : null}
+        {osGerada && osId && (
+          <div className="ss-card-row">
+            <button
+              type="button"
+              className="ss-os-link"
+              onClick={(e) => {
+                e.stopPropagation();
+                onViewOs && onViewOs(osId);
+              }}
+              title={`Abrir Ordem de Serviço #${osId} gerada por esta solicitação`}
+            >
+              <span role="img" aria-label="os">📋</span>
+              {' '}OS gerada: <strong>#{osId}</strong>
+              {osGerada.status ? (
+                <span className="ss-os-link-status">{' · '}{osGerada.status}</span>
+              ) : null}
+              {' '}<span aria-hidden="true">↗</span>
+            </button>
+          </div>
+        )}
         <div className="ss-card-row-space ss-card-footer">
           <span className="ss-card-meta">
             <span role="img" aria-label="solicitante">👤</span>
@@ -187,6 +215,11 @@ function GroupHeader({ title, count, collapsed, onToggle }: { title: string; cou
 // ─── Main screen ───────────────────────────────────────────────────────────
 function SolicitacoesDeServico() {
   const vm = useSolicitacaoViewModel();
+  const navigate = useNavigator();
+  const [searchParams] = useSearchParams();
+  // SS card no SGM-OS link de volta com ?ss=<id> para destacar a SS clicada;
+  // OS pode link de volta com ?osOrigem=<id> (não usado aqui, mas suportado).
+  const focusSsId = searchParams.get('ss');
 
   // ── Pure UI state (no Redux, no API) ──────────────────────────────────
   const [activePills, setActivePills] = useState<Set<string>>(new Set());
@@ -194,6 +227,19 @@ function SolicitacoesDeServico() {
   const [sortOption, setSortOption] = useState('date_desc');
   const [groupOption, setGroupOption] = useState('status');
   const [collapsedGroups, setCollapsedGroups] = useState(new Set<string>());
+
+  /**
+   * Navega para a OS gerada por uma SS. SGM-OS expõe `/os/executar/:id`
+   * para entrar na execução; o host (teraprox-core) faz o load do MF.
+   * stopPropagation já foi feito no card antes de chamar.
+   */
+  const handleViewOs = useCallback(
+    (osId: number | string) => {
+      if (osId == null || osId === '') return;
+      navigate(`/os/executar/${osId}`);
+    },
+    [navigate],
+  );
 
   // Subscribe to real-time updates
   useEffect(() => vm.subscribeRealtime(), []);
@@ -374,6 +420,8 @@ function SolicitacoesDeServico() {
                     solicitacao={ss}
                     onCardClick={() => vm.handleCardClick(ss)}
                     onAprovarClick={() => vm.handleAprovarClick(ss)}
+                    onViewOs={handleViewOs}
+                    highlight={focusSsId != null && String(ss.id) === String(focusSsId)}
                   />
                 ))}
             </div>
