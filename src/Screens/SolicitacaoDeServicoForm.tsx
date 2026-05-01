@@ -1,5 +1,5 @@
 import { SectorSelector, ActionButtons, AnexoManager } from 'teraprox-ui-kit';
-import { RecursoDisplayer } from '@teraprox/ui-kit-sgm';
+import { RecursoDisplayer } from '@hashcodeti/ui-kit-sgm';
 import { useRecursoDisplayerViewModel } from 'teraprox-core-sdk';
 import { formatIsoDate } from '../Services/stringUtils';
 import { useSolicitacaoFormViewModel } from '../view-models/ReduxSolicitacaoFormAdapter';

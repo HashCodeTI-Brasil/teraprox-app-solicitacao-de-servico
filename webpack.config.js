@@ -122,12 +122,12 @@ module.exports = {
                     requiredVersion: '^0.2.0',
                     eager: false,
                 },
-                '@teraprox/ui-kit-core': {
+                '@hashcodeti/ui-kit-core': {
                     singleton: true,
                     requiredVersion: '^0.1.0',
                     eager: false,
                 },
-                '@teraprox/ui-kit-sgm': {
+                '@hashcodeti/ui-kit-sgm': {
                     singleton: true,
                     requiredVersion: '^0.1.0',
                     eager: false,
